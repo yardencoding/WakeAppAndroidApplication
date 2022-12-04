@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="right"
+    android:id="@+id/days_textView"
+    >
+
+
+
+    <TextView
+        android:id="@+id/saturday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ש'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        />
+
+    <TextView
+        android:id="@+id/friday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ו'"
+        android:textStyle="bold"
+        android:layout_marginLeft="@dimen/days_text_view_space"
+        android:textSize="@dimen/days_text_view_size"
+        />
+
+    <TextView
+        android:id="@+id/thursday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ה'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        android:layout_marginLeft="@dimen/days_text_view_space"/>
+
+
+    <TextView
+        android:id="@+id/wednesday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ד'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        android:layout_marginLeft="@dimen/days_text_view_space"/>
+
+    <TextView
+        android:id="@+id/tuesday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ג'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        android:layout_marginLeft="@dimen/days_text_view_space"/>
+
+
+
+    <TextView
+        android:id="@+id/monday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ב'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        android:layout_marginLeft="@dimen/days_text_view_space"/>
+
+    <TextView
+        android:id="@+id/sunday_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="א'"
+        android:textStyle="bold"
+        android:textSize="@dimen/days_text_view_size"
+        android:layout_marginLeft="@dimen/days_text_view_space"/>
+
+
+
+
+
+</LinearLayout>

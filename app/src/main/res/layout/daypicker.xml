@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_horizontal"
+    android:id="@+id/daypicker"
+    >
+
+    <ToggleButton
+        android:id="@+id/saturday_tb"
+        style="@style/toggleButtonStyle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ש'"
+        android:textOn="ש'"
+        android:text="ש'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        />
+
+
+    <ToggleButton
+        android:id="@+id/friday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ו'"
+        android:textOn="ו'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+    <ToggleButton
+        android:id="@+id/thursday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ה'"
+        android:textOn="ה'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+    <ToggleButton
+        android:id="@+id/wednesday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ד'"
+        android:textOn="ד'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+    <ToggleButton
+        android:id="@+id/tuesday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ג'"
+        android:textOn="ג'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+    <ToggleButton
+        android:id="@+id/monday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="ב'"
+        android:textOn="ב'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+    <ToggleButton
+        android:id="@+id/sunday_tb"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/days_tb_background"
+        android:textOff="א'"
+        android:textOn="א'"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        style="@style/toggleButtonStyle"/>
+
+
+</LinearLayout>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "767703727566",
+    "project_id": "wakeupapp-fcdfb",
+    "storage_bucket": "wakeupapp-fcdfb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767703727566:android:ae7b231314829c899a3f9f",
+        "android_client_info": {
+          "package_name": "com.example.wakeup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767703727566-370jet9kjci3aqosv2nbp2agukqulkuh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-mkMmNaifzVVazqLDlpfLcA6br34k4mI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767703727566-370jet9kjci3aqosv2nbp2agukqulkuh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

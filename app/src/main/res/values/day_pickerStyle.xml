@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="toggleButtonStyle">
+        <item name="android:textColor">@drawable/days_tb_text_color</item>
+    </style>
+</resources>
