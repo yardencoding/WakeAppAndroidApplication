@@ -5,6 +5,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="390dp"
+
+    android:layoutDirection="ltr"
     >
 
     <androidx.cardview.widget.CardView
@@ -36,6 +38,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <Switch
+                android:id="@+id/alarm_sound_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:clickable="true"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/alarm_song_btn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/alarm_song_btn"
+                />
+
             <Button
                 android:id="@+id/alarm_song_btn"
                 android:layout_width="330dp"
@@ -50,18 +65,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/alarm_name_editText"
                 app:layout_goneMarginEnd="100dp" />
 
-            <Switch
-                android:id="@+id/alarm_sound_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:clickable="true"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                app:layout_constraintBottom_toBottomOf="@+id/alarm_song_btn"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/alarm_song_btn"
-                />
+
 
             <TextView
                 android:id="@+id/alarm_song_title_tv"

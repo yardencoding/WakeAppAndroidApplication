@@ -48,7 +48,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
 
         //Sorting them so the closest one will be on top
-        Alarm.sortAlarms(alarmList);
+       Alarm.sortAlarms(alarmList);
         adapter.notifyDataSetChanged();
 
         updateFirstMessage_thread();
