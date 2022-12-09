@@ -13,6 +13,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="15dp"
         android:onClick="popTimePicker"
+        android:backgroundTint="@color/grey"
         android:text="בחר שעה"
         android:textColor="@color/gold"
         android:textSize="28sp"

@@ -3,5 +3,7 @@
     <string name="go_to_alarm_settings">go to alarm settings</string>
     <dimen name="days_text_view_space">7dp</dimen>
     <dimen name="days_text_view_size">17dp</dimen>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

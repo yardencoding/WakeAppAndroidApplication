@@ -143,6 +143,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             } while(cursor.moveToNext());
         }
+        cursor.close();
+        database.close();
         return returnList;
     }
 
@@ -151,17 +153,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ALARM_ACTIVE, newState);
         database.update(ALARM_TABLE,contentValues, COLUMN_ALARM_ID + " = " + String.valueOf(alarm.getId()), null);
+        database.close();
     }
 
     public void deleteAlarm(Alarm alarm){
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(ALARM_TABLE, COLUMN_ALARM_ID + " = " + String.valueOf(alarm.getId()), null);
+        database.close();
     }
 
     public void changeAlarmSettings(int id, Alarm newAlarm){
 
         SQLiteDatabase database = this.getWritableDatabase();
         database.update(ALARM_TABLE, getAllContentValues(newAlarm), COLUMN_ALARM_ID + " = " + String.valueOf(id), null);
+        database.close();
 
     }
 

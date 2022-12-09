@@ -43,7 +43,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         recyclerView.setAdapter(adapter);
 
 
-        // Download alarms from Database and display on recyclerView
+        //Download alarms from Database and display on recyclerView
         DataBaseHelper.database = new DataBaseHelper(MainScreen.this);
         alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
 
