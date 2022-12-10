@@ -17,7 +17,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     private ArrayList<Alarm> alarms;
     private final int[] daysRgbValues = {255, 182, 193};
-    private final int checkedDays_TextViewSize = 20;
+    private final int checkedDays_TextViewSize = 18;
 
 
     public AlarmAdapter(ArrayList<Alarm> alarms, RecyclerViewInterface recyclerViewInterface) {

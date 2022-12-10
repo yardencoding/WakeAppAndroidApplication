@@ -35,6 +35,7 @@
         android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerview"
+        android:contentDescription="play audio"
         app:srcCompat="@drawable/play" />
 
     <ImageButton
@@ -46,6 +47,7 @@
         android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerview"
+        android:contentDescription="pause audio"
         app:srcCompat="@drawable/pause" />
 
     <com.google.android.material.slider.Slider
@@ -57,7 +59,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:trackHeight="10dp" />
+        app:trackHeight="10dp"
+        android:contentDescription="control volume"/>
 
     <ImageButton
         android:id="@+id/audio_image_button"
@@ -65,10 +68,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="45dp"
         android:background="@color/transparent"
+        android:contentDescription="set volume slider to minimum"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sound_slider"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/audio" />
+        app:srcCompat="@drawable/audio"
+        tools:ignore="TouchTargetSizeCheck" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

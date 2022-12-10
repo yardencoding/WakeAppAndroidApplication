@@ -4,15 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
 
 public class MainScreen extends AppCompatActivity implements RecyclerViewInterface {
 
@@ -48,8 +48,9 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
 
         //Sorting them so the closest one will be on top
-       Alarm.sortAlarms(alarmList);
+        Alarm.sortAlarms(alarmList);
         adapter.notifyDataSetChanged();
+
 
         updateFirstMessage_thread();
     }
@@ -59,19 +60,24 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     // must be a thread because otherwise the application will be frozen.
 
     public void updateFirstMessage_thread() {
-        updateAlarmTime_thread = new Thread() {
+        final int MILLISECONDS_TO_SLEEP = 100; //So it does not freeze the UI
+            updateAlarmTime_thread = new Thread() {
             public void run() {
                 while (Thread.currentThread().isInterrupted() == false) {
-                    Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
-                    if (alarm != null) {
-                        firstMessage.setText(alarm.getHowMuchTimeTillAlarm());
-                    } else {
-                        //Check if the list is not empty because if it is empty there are no alarms to be inactive.
-                        if (alarmList.isEmpty() == false)
-                            firstMessage.setText("כל ההתראות כבויות");
-                        else
-                            firstMessage.setText("התראות");
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            changeFirstMessageToAlarmTime();
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(MILLISECONDS_TO_SLEEP);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
+
                 }
             }
         };
@@ -101,6 +107,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         adapter.notifyItemRemoved(position);
 
         Toast.makeText(this, deletedAlarm.toString() + " נמחקה", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -117,6 +124,19 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
 
         startActivity(intent);
+    }
+
+    private void changeFirstMessageToAlarmTime(){
+        Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
+        if (alarm != null) {
+            firstMessage.setText(alarm.getHowMuchTimeTillAlarm());
+        } else {
+            //Check if the list is not empty because if it is empty there are no alarms to be inactive.
+            if (alarmList.isEmpty() == false)
+                firstMessage.setText("כל ההתראות כבויות");
+            else
+                firstMessage.setText("התראות");
+        }
     }
 
     @Override

@@ -30,6 +30,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private ImageButton saveImageButton;
     private Switch soundSwitch, vibrateSwitch, missionSwitch, useMyContactsSwitch;
 
+    private boolean hasSelectedTime = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +70,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                hasSelectedTime = true;
                 hour = selectedHour;
                 minute = selectedMinute;
                 timeButton.setTextSize(35);
@@ -83,15 +86,18 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 hour, minute,
                 true);
 
-
-        timePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "שמור", timePickerDialog);
-        timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "בטל", timePickerDialog);
         timePickerDialog.show();
     }
 
 
     @Override
     public void onClick(View view) {
+
+        if(getClickedAlarm() == null) //if We didn't came through an alarm click.
+        if(hasSelectedTime == false) {
+            Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
+            return; //To not create an alarm
+        }
 
         String name = alarmName.getText().toString();
         String mission = alarmMissionName.getText().toString();
