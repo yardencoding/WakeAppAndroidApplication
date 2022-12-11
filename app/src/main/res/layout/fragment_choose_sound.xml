@@ -17,8 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sound_names_recyclerview"
+    <ListView
+        android:id="@+id/sound_names_listView"
         android:layout_width="match_parent"
         android:layout_height="470dp"
         android:layout_marginTop="15dp"
@@ -34,7 +34,7 @@
         android:layout_marginEnd="15dp"
         android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerview"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_listView"
         android:contentDescription="play audio"
         app:srcCompat="@drawable/play" />
 
@@ -46,7 +46,7 @@
         android:layout_marginTop="30dp"
         android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerview"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_listView"
         android:contentDescription="pause audio"
         app:srcCompat="@drawable/pause" />
 
@@ -55,18 +55,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="45dp"
+        android:contentDescription="control volume"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:trackHeight="10dp"
-        android:contentDescription="control volume"/>
+         />
 
     <ImageButton
-        android:id="@+id/audio_image_button"
+        android:id="@+id/volume_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="50dp"
         android:background="@color/transparent"
         android:contentDescription="set volume slider to minimum"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -8,19 +8,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 
-public class MainScreen extends AppCompatActivity implements RecyclerViewInterface {
+public class MainScreen extends AppCompatActivity implements RecyclerViewInterface, View.OnClickListener {
 
     private RecyclerView recyclerView;
     private TextView firstMessage;
     private ArrayList<Alarm> alarmList;
     private AlarmAdapter adapter;
     private Thread updateAlarmTime_thread;
+    private Button addAlarmButton;
 
 
     @Override
@@ -28,9 +30,14 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
+        //Add alarm button
+        addAlarmButton = findViewById(R.id.add_btn);
+        addAlarmButton.setOnClickListener(this);
+
 
         // "התראות" text
         firstMessage = findViewById(R.id.first_message);
+
 
         // contains data from Firebase
         alarmList = new ArrayList<Alarm>();
@@ -85,12 +92,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     }
 
 
-    // when add button is clicked
-    public void createAlarm(View view) {
-        Intent intent = new Intent(this, CreateAlarm.class);
-        intent.putParcelableArrayListExtra("AlarmList", alarmList);
-        startActivity(intent);
-    }
+
 
     @Override
     public void onItemLongClick(int position) {
@@ -146,5 +148,12 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     }
 
 
+    @Override
+    public void onClick(View v) {
+        //When add button is clicked
+        Intent intent = new Intent(this, CreateAlarm.class);
+        intent.putParcelableArrayListExtra("AlarmList", alarmList);
+        startActivity(intent);
+    }
 }
 

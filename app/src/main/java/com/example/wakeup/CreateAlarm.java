@@ -29,6 +29,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private TextView alarmMissionName;
     private ImageButton saveImageButton;
     private Switch soundSwitch, vibrateSwitch, missionSwitch, useMyContactsSwitch;
+    private Button chooseSoundButton, missionButton, useContactsButton;
 
     private boolean hasSelectedTime = false;
 
@@ -38,9 +39,16 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_alarm);
 
         timeButton = findViewById(R.id.choose_time_btn);
+        timeButton.setOnClickListener(this);
         saveImageButton = findViewById(R.id.alarm_save_imageButton);
         saveImageButton.setOnClickListener(this);
 
+        chooseSoundButton = findViewById(R.id.alarm_song_btn);
+        chooseSoundButton.setOnClickListener(this);
+        missionButton = findViewById(R.id.alarm_mission_btn);
+        missionButton.setOnClickListener(this);
+        useContactsButton = findViewById(R.id.alarm_contacts_btn);
+        useContactsButton.setOnClickListener(this);
 
         sunday = findViewById(R.id.sunday_tb);
         monday = findViewById(R.id.monday_tb);
@@ -62,10 +70,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         alarmWasClicked();
     }
 
+
+
     // crates a timePicker dialog when "בחר שעה" btn is clicked
-    public void popTimePicker(View view) {
-
-
+    private void popTimePicker() {
         // when the user has finished choosing the time
         TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
@@ -93,6 +101,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
+        if(view.getId() == timeButton.getId()) popTimePicker();
+        //else if(view.getId() == chooseSoundButton.getId())
+       // else
         if(getClickedAlarm() == null) //if We didn't came through an alarm click.
         if(hasSelectedTime == false) {
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
@@ -159,6 +170,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         startActivity(intent);
 
     }
+
+
 
     //Set CreateAlarm fields to the corresponding clickedAlarm fields.
     private void alarmWasClicked() {
