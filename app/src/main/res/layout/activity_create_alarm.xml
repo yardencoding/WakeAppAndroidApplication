@@ -7,12 +7,13 @@
     android:background="@color/background_color"
     tools:context=".CreateAlarm">
 
+
+
     <Button
         android:id="@+id/choose_time_btn"
         android:layout_width="300dp"
         android:layout_height="70dp"
         android:layout_marginTop="15dp"
-        android:onClick="popTimePicker"
         android:backgroundTint="@color/grey"
         android:text="בחר שעה"
         android:textColor="@color/gold"

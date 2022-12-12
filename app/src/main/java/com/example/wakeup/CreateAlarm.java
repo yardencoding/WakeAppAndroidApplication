@@ -2,6 +2,8 @@ package com.example.wakeup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,13 +42,16 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         timeButton = findViewById(R.id.choose_time_btn);
         timeButton.setOnClickListener(this);
+
         saveImageButton = findViewById(R.id.alarm_save_imageButton);
         saveImageButton.setOnClickListener(this);
 
         chooseSoundButton = findViewById(R.id.alarm_song_btn);
         chooseSoundButton.setOnClickListener(this);
+
         missionButton = findViewById(R.id.alarm_mission_btn);
         missionButton.setOnClickListener(this);
+
         useContactsButton = findViewById(R.id.alarm_contacts_btn);
         useContactsButton.setOnClickListener(this);
 
@@ -102,19 +107,20 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
 
         if(view.getId() == timeButton.getId()) popTimePicker();
-        //else if(view.getId() == chooseSoundButton.getId())
-       // else
-        if(getClickedAlarm() == null) //if We didn't came through an alarm click.
-        if(hasSelectedTime == false) {
+
+        else if(view.getId() == chooseSoundButton.getId()){
+            //Open choose sound fragment
+
+        }
+
+        if(getClickedAlarm() == null && hasSelectedTime == false) {
+            // Check if time was selected, When we opened this activity through add button.
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
             return; //To not create an alarm
         }
 
         String name = alarmName.getText().toString();
         String mission = alarmMissionName.getText().toString();
-
-        //If we opened this activity through add button.
-
         Alarm newAlarm = new Alarm(
                     true,
                     hour,
@@ -138,32 +144,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             newAlarm.whenNoDay_WasChosen();
 
 
-        //To check if the newAlarm dose not already exists.
-        ArrayList<Alarm> alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
-        if (!(newAlarm.alreadyExist(alarmList_FromIntent))) {
-
-
-            if(getClickedAlarm() == null) {
-                //Add alarm to database. When we opened this activity through add button.
-                DataBaseHelper.database.addAlarmToDataBase(newAlarm);
-                Log.d("TAG", "add button click ");
-
-            } else{
-                //Change clicked alarm settings. When we opened this activity through an alarm click.
-                DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
-                Log.d("TAG", "alarm  click ");
-
-            }
-            // Toast message with the remaining time until the alarm
-            Toast.makeText(CreateAlarm.this, newAlarm.getHowMuchTimeTillAlarm(), Toast.LENGTH_LONG).show();
-
-        } else {
-            //Toast message that says alarm already exist
-            Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_LONG).show();
-        }
-
-
-
+        addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
         // go to the first activity
         Intent intent = new Intent(this, MainScreen.class);
@@ -203,6 +184,29 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         Intent intent = getIntent();
         Alarm clickedAlarm = intent.getParcelableExtra("getClickedAlarm");
         return clickedAlarm;
+    }
+
+    private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm){
+        //To check if the newAlarm dose not already exists.
+        ArrayList<Alarm> alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
+        if (!(newAlarm.alreadyExist(alarmList_FromIntent))) {
+
+
+            if(getClickedAlarm() == null) {
+                //Add alarm to database. When we opened this activity through add button.
+                DataBaseHelper.database.addAlarmToDataBase(newAlarm);
+
+            } else{
+                //Change clicked alarm settings. When we opened this activity through an alarm click.
+                DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
+            }
+            // Toast message with the remaining time until the alarm
+            Toast.makeText(CreateAlarm.this, newAlarm.getHowMuchTimeTillAlarm(), Toast.LENGTH_LONG).show();
+
+        } else {
+            //Toast message that says alarm already exist
+            Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_LONG).show();
+        }
     }
 
 
