@@ -2,6 +2,7 @@ package com.example.wakeup;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.slider.Slider;
@@ -32,7 +32,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_choose_sound, container);
+        View view = inflater.inflate(R.layout.fragment_choose_sound, container, false);
         return view;
     }
 
@@ -42,6 +42,10 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         play = view.findViewById(R.id.play_audio_button);
         pause = view.findViewById(R.id.pause_audio_button);
         volume = view.findViewById(R.id.volume_image_button);
+
+        play.setOnClickListener(this);
+        pause.setOnClickListener(this);
+        volume.setOnClickListener(this);
 
         //Slider
         soundSlider = view.findViewById(R.id.sound_slider);
@@ -62,7 +66,6 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent , View view, int position, long id) {
-                 clickedRadioButton = (RadioButton) parent.getItemAtPosition(position);
             }
         });
 
@@ -94,7 +97,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
         //To check if the RadioButton is checked,and if not display a Toast message.
         if(view.getId() == play.getId() || view.getId() == pause.getId())
-            if(clickedRadioButton.isChecked() == false){
+            if(clickedRadioButton == null){
                 Toast.makeText(requireContext(), "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
                 return; //Exit. radio button is not checked or null.
 

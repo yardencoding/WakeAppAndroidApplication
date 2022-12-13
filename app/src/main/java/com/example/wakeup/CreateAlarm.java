@@ -2,13 +2,12 @@ package com.example.wakeup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,8 +31,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private ImageButton saveImageButton;
     private Switch soundSwitch, vibrateSwitch, missionSwitch, useMyContactsSwitch;
     private Button chooseSoundButton, missionButton, useContactsButton;
+    private ConstraintLayout createAlarmLayout;
+
 
     private boolean hasSelectedTime = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
 
+       createAlarmLayout = findViewById(R.id.createAlarmLayout);
 
         //If we opened this activity through an alarm click,
         // change fields values to the corresponding clickedAlarm values.
@@ -109,7 +112,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         if(view.getId() == timeButton.getId()) popTimePicker();
 
         else if(view.getId() == chooseSoundButton.getId()){
+
+            //Remove the current views in activity, so they won't display in fragment.
+            createAlarmLayout.removeAllViews();
+
             //Open choose sound fragment
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.createAlarmLayout, new ChooseSoundFragment());
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
 
         }
 
