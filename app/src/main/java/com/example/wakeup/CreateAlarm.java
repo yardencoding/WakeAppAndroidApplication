@@ -71,7 +71,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
 
-       createAlarmLayout = findViewById(R.id.createAlarmLayout);
+       createAlarmLayout = findViewById(R.id.f1);
 
         //If we opened this activity through an alarm click,
         // change fields values to the corresponding clickedAlarm values.
@@ -111,6 +111,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         if(view.getId() == timeButton.getId()) popTimePicker();
 
+
         else if(view.getId() == chooseSoundButton.getId()){
 
             //Remove the current views in activity, so they won't display in fragment.
@@ -119,10 +120,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             //Open choose sound fragment
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.createAlarmLayout, new ChooseSoundFragment());
+            fragmentTransaction.replace(R.id.f1, new ChooseSoundFragment());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
-
 
         }
 

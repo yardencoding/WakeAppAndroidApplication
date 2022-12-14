@@ -19,14 +19,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/sound_names_listView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/sound_names_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="470dp"
         android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:clickable="true"
+        android:choiceMode="singleChoice"
         app:layout_constraintTop_toBottomOf="@+id/choose_sound_textview" />
 
     <ImageButton
@@ -37,7 +37,7 @@
         android:layout_marginEnd="15dp"
         android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_listView"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerView"
         android:contentDescription="play audio"
         app:srcCompat="@drawable/play" />
 
@@ -49,7 +49,7 @@
         android:layout_marginTop="30dp"
         android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_listView"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerView"
         android:contentDescription="pause audio"
         app:srcCompat="@drawable/pause" />
 
