@@ -123,6 +123,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             fragmentTransaction.replace(R.id.f1, new ChooseSoundFragment());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
+            return;
 
         }
 

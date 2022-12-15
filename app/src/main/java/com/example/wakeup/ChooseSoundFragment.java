@@ -1,21 +1,27 @@
 package com.example.wakeup;
 
+import static android.content.Context.AUDIO_SERVICE;
+
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -29,6 +35,9 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
     private ArrayList<RadioButton> radioButtonList;
     private ChooseSoundAdapter adapter;
     private MediaPlayer mediaPlayer;
+    private AudioManager audioManager;
+
+    private int maxDeviceVolume, currentDeviceVolume;
 
 
     @Override
@@ -49,12 +58,23 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         pause.setOnClickListener(this);
         volume.setOnClickListener(this);
 
+
+        audioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
+        maxDeviceVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        currentDeviceVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+
+
         //Slider
         soundSlider = view.findViewById(R.id.sound_slider);
+        soundSlider.setValueFrom(0);
+        soundSlider.setValueTo(100);
+        //soundSlider.setValue(currentDeviceVolume);
+        initializeSliderListeners();
+
 
         //Create a map with the corresponding song and song name
         soundNameMap = createSoundNameMap();
-
         radioButtonList = getRadioButtonList();
 
 
@@ -64,6 +84,14 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ChooseSoundAdapter(radioButtonList, this);
         recyclerView.setAdapter(adapter);
+
+        //Add space to recyclerview items.
+        DividerItemDecoration itemDecorationSpace = new DividerItemDecoration(recyclerView.getContext()
+                , DividerItemDecoration.VERTICAL);
+        itemDecorationSpace.setDrawable(    ContextCompat.getDrawable(getContext(), R.drawable.divider_space_choose_sound)
+        );
+        //Add 7dp space between recyclerview items.
+        recyclerView.addItemDecoration(itemDecorationSpace);
 
         //Initialize a MediaPlayer obj.
         mediaPlayer = new MediaPlayer();
@@ -105,17 +133,69 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         return list;
     }
 
+    private void initializeSliderListeners(){
+
+
+        soundSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+
+                // Responds when the slider is being start
+                soundSlider.setTrackHeight(20);
+            }
+
+            int defaultTrackHeight = soundSlider.getTrackHeight();
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                // Responds when the slider is being stopped
+                soundSlider.setTrackHeight(defaultTrackHeight);
+            }
+        });
+
+
+
+        soundSlider.setLabelFormatter(new LabelFormatter() {
+            @NonNull
+            @Override
+            public String getFormattedValue(float value) {
+                return (int) value +"";
+            }
+        });
+
+
+
+
+        //When slider value changed
+        soundSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float newValue, boolean fromUser) {
+
+                if(mediaPlayer != null) {
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) newValue / (100 / maxDeviceVolume), 0);
+                }
+
+            }
+        });
+    }
+
+
+
     @Override
     public void onClick(View view) {
 
+        if(view.getId() == play.getId() || view.getId() == pause.getId())
+            if(clickedRadioButton == null){
+                Toast.makeText(requireContext(), "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
+                return; //Exit. radio button is not checked.
+            }
+
 
         //To check if the RadioButton is checked,and if not display a Toast message.
-        if (view.getId() == play.getId())
-            if (clickedRadioButton == null) {
-                Toast.makeText(requireContext(), "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
-                return; //Exit. radio button is not checked or null.
+        if (view.getId() == play.getId()) {
 
-            } else {
+                //If I change song name when the song is playing. Stop the previous song.
+                if(mediaPlayer.isPlaying()) mediaPlayer.stop();
+
                 //Initialize a MediaPlayer
                 String key = clickedRadioButton.getText().toString();
                 mediaPlayer = MediaPlayer.create(requireContext(), soundNameMap.get(key));
@@ -124,9 +204,12 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
             }
 
         else if (view.getId() == pause.getId()) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-            }
+             if (mediaPlayer.isPlaying())
+                    mediaPlayer.pause();
+
+        } else {
+            //Volume button is clicked. Change slider value to the minimum value(5).
+            soundSlider.setValue(5);
         }
     }
 
@@ -205,6 +288,14 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
                 return radioButtonList.size();
             }
 
+
+
         }
 
+
+    @Override
+    public void onDestroy() {
+        mediaPlayer.release();
+        super.onDestroy();
     }
+}
