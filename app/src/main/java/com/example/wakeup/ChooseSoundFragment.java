@@ -4,9 +4,7 @@ import static android.content.Context.AUDIO_SERVICE;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -65,11 +62,10 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
 
 
-        //Slider
+                //Slider
         soundSlider = view.findViewById(R.id.sound_slider);
-        soundSlider.setValueFrom(0);
-        soundSlider.setValueTo(100);
-        //soundSlider.setValue(currentDeviceVolume);
+        //Set the slider value to the current deviceVolume.
+        soundSlider.setValue(currentDeviceVolume * (100f / maxDeviceVolume));
         initializeSliderListeners();
 
 
@@ -154,11 +150,12 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
 
 
+        //Cast slider label values from decimals to (int).
         soundSlider.setLabelFormatter(new LabelFormatter() {
             @NonNull
             @Override
             public String getFormattedValue(float value) {
-                return (int) value +"";
+                return (int) value +"%";
             }
         });
 
@@ -169,6 +166,11 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         soundSlider.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float newValue, boolean fromUser) {
+                //
+                if(newValue < getMinimumDeviceVolumeFromZeroToHundred()) {
+                    newValue = getMinimumDeviceVolumeFromZeroToHundred();
+                    soundSlider.setValue(newValue);
+                }
 
                 if(mediaPlayer != null) {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) newValue / (100 / maxDeviceVolume), 0);
@@ -177,6 +179,16 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
             }
         });
     }
+
+    private int getMinimumDeviceVolumeFromZeroToHundred(){
+        for(int volume = 1; volume < 100; volume++){
+            if(volume / (100 / maxDeviceVolume) >= 1)
+                return volume;
+        }
+
+        return -1;
+    }
+
 
 
 
@@ -208,8 +220,8 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
                     mediaPlayer.pause();
 
         } else {
-            //Volume button is clicked. Change slider value to the minimum value(5).
-            soundSlider.setValue(5);
+            //Volume button is clicked. Change slider value to the minimum device volume.
+            soundSlider.setValue(getMinimumDeviceVolumeFromZeroToHundred());
         }
     }
 

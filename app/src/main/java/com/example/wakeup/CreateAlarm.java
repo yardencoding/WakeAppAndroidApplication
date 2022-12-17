@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -71,13 +72,12 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
 
-       createAlarmLayout = findViewById(R.id.f1);
+        createAlarmLayout = findViewById(R.id.f1);
 
         //If we opened this activity through an alarm click,
         // change fields values to the corresponding clickedAlarm values.
         alarmWasClicked();
     }
-
 
 
     // crates a timePicker dialog when "בחר שעה" btn is clicked
@@ -109,10 +109,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        if(view.getId() == timeButton.getId()) popTimePicker();
+        if (view.getId() == timeButton.getId()) popTimePicker();
 
 
-        else if(view.getId() == chooseSoundButton.getId()){
+        else if (view.getId() == chooseSoundButton.getId()) {
 
             //Remove the current views in activity, so they won't display in fragment.
             createAlarmLayout.removeAllViews();
@@ -127,15 +127,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         }
 
-        if(getClickedAlarm() == null && hasSelectedTime == false) {
+       else if (getClickedAlarm() == null && hasSelectedTime == false) {
             // Check if time was selected, When we opened this activity through add button.
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
             return; //To not create an alarm
-        }
 
-        String name = alarmName.getText().toString();
-        String mission = alarmMissionName.getText().toString();
-        Alarm newAlarm = new Alarm(
+        } else {
+
+
+            String name = alarmName.getText().toString();
+            String mission = alarmMissionName.getText().toString();
+            Alarm newAlarm = new Alarm(
                     true,
                     hour,
                     minute,
@@ -154,18 +156,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     useMyContactsSwitch.isChecked()
             );
 
-        if (newAlarm.hasNoChosenDay())
-            newAlarm.whenNoDay_WasChosen();
+            if (newAlarm.hasNoChosenDay())
+                newAlarm.whenNoDay_WasChosen();
 
 
-        addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
+            addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
-        // go to the first activity
-        Intent intent = new Intent(this, MainScreen.class);
-        startActivity(intent);
-
+            // go to the first activity
+            Intent intent = new Intent(this, MainScreen.class);
+            startActivity(intent);
+        }
     }
-
 
 
     //Set CreateAlarm fields to the corresponding clickedAlarm fields.
@@ -200,17 +201,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return clickedAlarm;
     }
 
-    private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm){
+    private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm) {
         //To check if the newAlarm dose not already exists.
         ArrayList<Alarm> alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
         if (!(newAlarm.alreadyExist(alarmList_FromIntent))) {
 
 
-            if(getClickedAlarm() == null) {
+            if (getClickedAlarm() == null) {
                 //Add alarm to database. When we opened this activity through add button.
                 DataBaseHelper.database.addAlarmToDataBase(newAlarm);
 
-            } else{
+            } else {
                 //Change clicked alarm settings. When we opened this activity through an alarm click.
                 DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
             }
@@ -222,7 +223,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_LONG).show();
         }
     }
-
 
 
 }
