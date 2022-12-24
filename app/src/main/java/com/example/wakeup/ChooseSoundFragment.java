@@ -2,23 +2,30 @@ package com.example.wakeup;
 
 import static android.content.Context.AUDIO_SERVICE;
 
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -33,9 +40,8 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
     private ChooseSoundAdapter adapter;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
-
-    private int maxDeviceVolume, currentDeviceVolume;
-
+    private int maxAlarmStreamVolume;
+    private boolean isMediaPlayerPaused;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,17 +62,15 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         volume.setOnClickListener(this);
 
 
-        audioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
-        maxDeviceVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        currentDeviceVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-
-
-
-                //Slider
+        //Slider
         soundSlider = view.findViewById(R.id.sound_slider);
-        //Set the slider value to the current deviceVolume.
-        soundSlider.setValue(currentDeviceVolume * (100f / maxDeviceVolume));
+        soundSlider.setValue(60);
         initializeSliderListeners();
+
+        //AudioManager
+        audioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
+        maxAlarmStreamVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 60 / (100 / maxAlarmStreamVolume), 0);
 
 
         //Create a map with the corresponding song and song name
@@ -84,16 +88,19 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         //Add space to recyclerview items.
         DividerItemDecoration itemDecorationSpace = new DividerItemDecoration(recyclerView.getContext()
                 , DividerItemDecoration.VERTICAL);
-        itemDecorationSpace.setDrawable(    ContextCompat.getDrawable(getContext(), R.drawable.divider_space_choose_sound)
+        itemDecorationSpace.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.divider_space_choose_sound)
         );
         //Add 7dp space between recyclerview items.
         recyclerView.addItemDecoration(itemDecorationSpace);
 
-        //Initialize a MediaPlayer obj.
+        //Initialize a MediaPlayer obj with audio attributes.
         mediaPlayer = new MediaPlayer();
-
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build());
 
     }
+
 
     private LinkedHashMap<String, Integer> createSoundNameMap() {
         LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
@@ -129,7 +136,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         return list;
     }
 
-    private void initializeSliderListeners(){
+    private void initializeSliderListeners() {
 
 
         soundSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
@@ -140,14 +147,12 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
                 soundSlider.setTrackHeight(20);
             }
 
-            int defaultTrackHeight = soundSlider.getTrackHeight();
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 // Responds when the slider is being stopped
-                soundSlider.setTrackHeight(defaultTrackHeight);
+                soundSlider.setTrackHeight(12);
             }
         });
-
 
 
         //Cast slider label values from decimals to (int).
@@ -155,154 +160,158 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
             @NonNull
             @Override
             public String getFormattedValue(float value) {
-                return (int) value +"%";
+                return (int) value + "%";
             }
         });
-
-
 
 
         //When slider value changed
         soundSlider.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float newValue, boolean fromUser) {
-                //
-                if(newValue < getMinimumDeviceVolumeFromZeroToHundred()) {
-                    newValue = getMinimumDeviceVolumeFromZeroToHundred();
+                // checks if the newValue is smaller than the minimum stream volume.
+                if (newValue < 6) {
+                    newValue = 6;
                     soundSlider.setValue(newValue);
                 }
 
-                if(mediaPlayer != null) {
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) newValue / (100 / maxDeviceVolume), 0);
-                }
-
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, (int) newValue / (100 / maxAlarmStreamVolume), 0);
             }
         });
     }
-
-    private int getMinimumDeviceVolumeFromZeroToHundred(){
-        for(int volume = 1; volume < 100; volume++){
-            if(volume / (100 / maxDeviceVolume) >= 1)
-                return volume;
-        }
-
-        return -1;
-    }
-
-
 
 
     @Override
     public void onClick(View view) {
 
-        if(view.getId() == play.getId() || view.getId() == pause.getId())
-            if(clickedRadioButton == null){
+        if (view.getId() == play.getId() || view.getId() == pause.getId())
+            if (clickedRadioButton == null) {
                 Toast.makeText(requireContext(), "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
                 return; //Exit. radio button is not checked.
             }
 
 
-        //To check if the RadioButton is checked,and if not display a Toast message.
+        //Clicked play button
         if (view.getId() == play.getId()) {
 
-                //If I change song name when the song is playing. Stop the previous song.
-                if(mediaPlayer.isPlaying()) mediaPlayer.stop();
-
-                //Initialize a MediaPlayer
-                String key = clickedRadioButton.getText().toString();
-                mediaPlayer = MediaPlayer.create(requireContext(), soundNameMap.get(key));
-                mediaPlayer.setLooping(true);
+            //If I play the song after pausing it.
+            if (isMediaPlayerPaused == true) {
                 mediaPlayer.start();
+                isMediaPlayerPaused = false;
+                return;
             }
 
-        else if (view.getId() == pause.getId()) {
-             if (mediaPlayer.isPlaying())
-                    mediaPlayer.pause();
+            //If I change the song name when the song is playing, Stop the previous song.
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+            }
 
+            String key = clickedRadioButton.getText().toString();
+            try {
+                //Set mediaPlayer sound
+                mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://com.example.wakeup/" + soundNameMap.get(key)));
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+
+
+            //Pause button is clicked
+        } else if (view.getId() == pause.getId()) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                isMediaPlayerPaused = true;
+            }
+
+            //Volume button is clicked.
         } else {
-            //Volume button is clicked. Change slider value to the minimum device volume.
-            soundSlider.setValue(getMinimumDeviceVolumeFromZeroToHundred());
+            // Change slider value to the minimum device volume(6).
+            soundSlider.setValue(6);
         }
     }
 
 
-        @Override
-        public void onItemClick ( int position){
-            adapter.notifyItemChanged(adapter.copyLastCheckedPosition);
-            adapter.notifyItemChanged(adapter.lastCheckedPosition);
+    @Override
+    public void onItemClick(int position) {
+        adapter.notifyItemChanged(adapter.copyLastCheckedPosition);
+        adapter.notifyItemChanged(adapter.lastCheckedPosition);
 
-            clickedRadioButton = radioButtonList.get(position);
+        clickedRadioButton = radioButtonList.get(position);
 
+    }
+
+    //Don't need
+    @Override
+    public void onItemLongClick(int position) {
+    }
+
+
+
+
+    //Recyclerview Adapter + ViewHolder
+    private class ChooseSoundAdapter extends RecyclerView.Adapter<ChooseSoundAdapter.ChooseSoundViewHolder> {
+
+        private RecyclerViewInterface recyclerViewInterface;
+        private ArrayList<RadioButton> radioButtonList;
+        private int lastCheckedPosition = -1;
+        private int copyLastCheckedPosition;
+
+
+        public ChooseSoundAdapter(ArrayList<RadioButton> radioButtonList, RecyclerViewInterface recyclerViewInterface) {
+            this.radioButtonList = radioButtonList;
+            this.recyclerViewInterface = recyclerViewInterface;
         }
 
-        //Don't need
-        @Override
-        public void onItemLongClick ( int position){
-        }
 
+        class ChooseSoundViewHolder extends RecyclerView.ViewHolder {
+            RadioButton radioButton;
 
-        //Recyclerview Adapter + ViewHolder
-        private class ChooseSoundAdapter extends RecyclerView.Adapter<ChooseSoundAdapter.ChooseSoundViewHolder> {
+            public ChooseSoundViewHolder(View itemView) {
+                super(itemView);
+                radioButton = itemView.findViewById(R.id.choose_sound_radioButton);
 
-            private RecyclerViewInterface recyclerViewInterface;
-            private ArrayList<RadioButton> radioButtonList;
-            private int lastCheckedPosition = -1;
-            private int copyLastCheckedPosition;
+                radioButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = getAdapterPosition();
+                        if (recyclerViewInterface != null && position != RecyclerView.NO_POSITION) {
 
+                            copyLastCheckedPosition = lastCheckedPosition;
+                            lastCheckedPosition = position;
 
-            public ChooseSoundAdapter(ArrayList<RadioButton> radioButtonList, RecyclerViewInterface recyclerViewInterface) {
-                this.radioButtonList = radioButtonList;
-                this.recyclerViewInterface = recyclerViewInterface;
-            }
-
-
-            class ChooseSoundViewHolder extends RecyclerView.ViewHolder {
-                RadioButton radioButton;
-
-                public ChooseSoundViewHolder(View itemView) {
-                    super(itemView);
-                    radioButton = itemView.findViewById(R.id.choose_sound_radioButton);
-
-                    radioButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int position = getAdapterPosition();
-                            if (recyclerViewInterface != null && position != RecyclerView.NO_POSITION) {
-
-                                copyLastCheckedPosition = lastCheckedPosition;
-                                lastCheckedPosition = position;
-
-                                recyclerViewInterface.onItemClick(position);
-                            }
+                            recyclerViewInterface.onItemClick(position);
                         }
-                    });
+                    }
+                });
 
-                }
             }
-
-            @NonNull
-            @Override
-            public ChooseSoundViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.choose_sound_reyclerview_item, parent, false);
-                return new ChooseSoundViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(@NonNull ChooseSoundViewHolder holder, int position) {
-                RadioButton currentRadioButton = radioButtonList.get(position);
-                holder.radioButton.setText(currentRadioButton.getText());
-                holder.radioButton.setChecked(position == lastCheckedPosition);
-            }
-
-            @Override
-            public int getItemCount() {
-                return radioButtonList.size();
-            }
-
-
-
         }
+
+        @NonNull
+        @Override
+        public ChooseSoundViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.choose_sound_reyclerview_item, parent, false);
+            return new ChooseSoundViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ChooseSoundViewHolder holder, int position) {
+            RadioButton currentRadioButton = radioButtonList.get(position);
+            holder.radioButton.setText(currentRadioButton.getText());
+            holder.radioButton.setChecked(position == lastCheckedPosition);
+        }
+
+        @Override
+        public int getItemCount() {
+            return radioButtonList.size();
+        }
+
+
+    }
 
 
     @Override
