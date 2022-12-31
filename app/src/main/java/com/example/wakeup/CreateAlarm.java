@@ -116,22 +116,12 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        if (view.getId() == timeButton.getId()) popTimePicker();
-
+        if (view.getId() == timeButton.getId())
+            popTimePicker();
 
         else if (view.getId() == chooseSoundButton.getId()) {
-
-            //Remove the current views in activity, so they won't display in fragment.
-            createAlarmLayout.removeAllViews();
-
-            //Open choose sound fragment
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.f1, new ChooseSoundFragment());
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-            return;
-
+            Intent goToChooseSound = new Intent(this, ChooseSound.class);
+            startActivity(goToChooseSound);
         }
 
        else if (getClickedAlarm() == null && hasSelectedTime == false) {
@@ -170,8 +160,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
             // go to the first activity
-            Intent intent = new Intent(this, MainScreen.class);
-            startActivity(intent);
+            Intent goToNainScreen = new Intent(this, MainScreen.class);
+            startActivity(goToNainScreen);
         }
     }
 

@@ -1,13 +1,12 @@
 package com.example.wakeup;
 
-import static android.content.Context.AUDIO_SERVICE;
 
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,8 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class ChooseSoundFragment extends Fragment implements View.OnClickListener, RecyclerViewInterface {
+public class ChooseSound extends AppCompatActivity implements View.OnClickListener, RecyclerViewInterface {
 
     private ImageButton play, pause, volume;
     private Slider soundSlider;
@@ -43,19 +42,16 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
     private int maxAlarmStreamVolume;
     private boolean isMediaPlayerPaused;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_choose_sound, container, false);
-        return view;
-
-    }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.choose_sound);
+
         //ImageButtons
-        play = view.findViewById(R.id.play_audio_button);
-        pause = view.findViewById(R.id.pause_audio_button);
-        volume = view.findViewById(R.id.volume_image_button);
+        play = findViewById(R.id.play_audio_button);
+        pause = findViewById(R.id.pause_audio_button);
+        volume = findViewById(R.id.volume_image_button);
 
         play.setOnClickListener(this);
         pause.setOnClickListener(this);
@@ -63,12 +59,12 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
 
         //Slider
-        soundSlider = view.findViewById(R.id.sound_slider);
+        soundSlider = findViewById(R.id.sound_slider);
         soundSlider.setValue(60);
         initializeSliderListeners();
 
         //AudioManager
-        audioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         maxAlarmStreamVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 60 / (100 / maxAlarmStreamVolume), 0);
 
@@ -79,8 +75,8 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
 
         //Recyclerview
-        recyclerView = view.findViewById(R.id.sound_names_recyclerView);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        recyclerView = findViewById(R.id.sound_names_recyclerView);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ChooseSoundAdapter(radioButtonList, this);
         recyclerView.setAdapter(adapter);
@@ -88,7 +84,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         //Add space to recyclerview items.
         DividerItemDecoration itemDecorationSpace = new DividerItemDecoration(recyclerView.getContext()
                 , DividerItemDecoration.VERTICAL);
-        itemDecorationSpace.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.divider_space_choose_sound)
+        itemDecorationSpace.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider_space_choose_sound)
         );
         //Add 7dp space between recyclerview items.
         recyclerView.addItemDecoration(itemDecorationSpace);
@@ -101,6 +97,23 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
     }
 
+    // To hide hardware volume buttons
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+
+        int steps = 5;
+        if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP){
+              soundSlider.setValue(soundSlider.getValue() + steps);
+            return true;
+        }
+
+        if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN){
+            soundSlider.setValue(soundSlider.getValue() - steps);
+            return true;
+        }
+
+        return super.dispatchKeyEvent(event);
+    }
 
     private LinkedHashMap<String, Integer> createSoundNameMap() {
         LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
@@ -128,7 +141,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
         //Iterate over soundNameMap to create a new RadioButton with the corresponding sound name.
         for (int i = 0; i < soundNameMap.size(); i++) {
 
-            RadioButton radioButton = new RadioButton(requireContext());
+            RadioButton radioButton = new RadioButton(this);
             radioButton.setText(soundNameMap.keySet().toArray()[i].toString());
             list.add(radioButton);
         }
@@ -174,6 +187,12 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
                     newValue = 6;
                     soundSlider.setValue(newValue);
                 }
+                // checks if the newValue is greater than the maximum slider value.
+                if(newValue > 100) {
+                    newValue = 100;
+                    soundSlider.setValue(newValue);
+                }
+
 
                 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, (int) newValue / (100 / maxAlarmStreamVolume), 0);
             }
@@ -186,7 +205,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
 
         if (view.getId() == play.getId() || view.getId() == pause.getId())
             if (clickedRadioButton == null) {
-                Toast.makeText(requireContext(), "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
                 return; //Exit. radio button is not checked.
             }
 
@@ -210,7 +229,7 @@ public class ChooseSoundFragment extends Fragment implements View.OnClickListene
             String key = clickedRadioButton.getText().toString();
             try {
                 //Set mediaPlayer sound
-                mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://com.example.wakeup/" + soundNameMap.get(key)));
+                mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + soundNameMap.get(key)));
                 mediaPlayer.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
