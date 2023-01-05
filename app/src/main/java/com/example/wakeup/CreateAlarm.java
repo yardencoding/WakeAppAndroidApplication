@@ -149,8 +149,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         else if (view.getId() == chooseSoundButton.getId()) {
             Intent goToChooseSound = new Intent(this, ChooseSound.class);
-            Intent intent = new Intent();
-            intent.putExtra("soundName", alarmSoundName.getText().toString());
+            goToChooseSound.putExtra("soundName", alarmSoundName.getText().toString());
             activityResultLauncher.launch(goToChooseSound);
 
         } else if (getClickedAlarm() == null && hasSelectedTime == false) {

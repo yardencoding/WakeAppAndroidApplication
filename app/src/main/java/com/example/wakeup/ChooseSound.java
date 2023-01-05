@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -97,13 +98,18 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         Searching through RadioGroup to find the RadioButton with the same sound name
         as CreateAlarm sound name and set him to TRUE.
          */
+
         Intent intentFromCreateAlarm = getIntent();
         String text = intentFromCreateAlarm.getStringExtra("soundName");
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
-            RadioButton radioButtonWithTheSameSoundName = (RadioButton) radioGroup.getChildAt(i);
-            if (radioButtonWithTheSameSoundName.getText().toString().equals(text))
-                radioButtonWithTheSameSoundName.setChecked(true);
+             clickedRadioButton = (RadioButton) radioGroup.getChildAt(i);
+            if (clickedRadioButton.getText().toString().equals(text)) {
+                clickedRadioButton.setChecked(true);
+                break;
+            }
         }
+
+
     }
 
     private int getSoundID(String soundId) {
