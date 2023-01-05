@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
 
+    //ALARM TABLE
     private static final String ALARM_TABLE = "ALARM_TABLE";
     private static final String COLUMN_ALARM_ID = "_ID";
     private static final String COLUMN_ALARM_ACTIVE = "ACTIVE";
@@ -22,6 +23,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ALARM_MINUTE = "MINUTE";
     private static final String COLUMN_ALARM_NAME = "NAME";
     private static final String COLUMN_ALARM_MISSION = "MISSION";
+    private static final String COLUMN_ALARM_SOUND_NAME = "SOUND_NAME";
     private static final String COLUMN_ALARM_SUNDAY = "SUNDAY";
     private static final String COLUMN_ALARM_MONDAY = "MONDAY";
     private static final String COLUMN_ALARM_TUESDAY = "TUESDAY";
@@ -33,6 +35,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ALARM_HAS_VIBRATE = "HAS_VIBRATE";
     private static final String COLUMN_ALARM_HAS_MISSION= "HAS_MISSION";
     private static final String COLUMN_ALARM_HAS_CONTACTS= "HAS_CONTACTS";
+
 
     public static DataBaseHelper database;
 
@@ -46,7 +49,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        String createTableCommand =
+        String createAlarmTableCommand =
                 "CREATE TABLE "
                 + ALARM_TABLE +
                 " (" +
@@ -56,6 +59,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ALARM_MINUTE + " INT, "
                 + COLUMN_ALARM_NAME + " TEXT, "
                 + COLUMN_ALARM_MISSION + " TEXT, "
+                + COLUMN_ALARM_SOUND_NAME + " TEXT, "
                 + COLUMN_ALARM_SUNDAY + " BOOL, "
                 + COLUMN_ALARM_MONDAY + " BOOL, "
                 + COLUMN_ALARM_TUESDAY + " BOOL, "
@@ -66,10 +70,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ALARM_HAS_SOUND + " BOOL, "
                 + COLUMN_ALARM_HAS_VIBRATE +" BOOL, "
                 + COLUMN_ALARM_HAS_MISSION +" BOOL,"
-                + COLUMN_ALARM_HAS_CONTACTS +" BOOL);"
+                + COLUMN_ALARM_HAS_CONTACTS +" BOOL"
+                +");"
                 ;
 
-        sqLiteDatabase.execSQL(createTableCommand);
+
+        sqLiteDatabase.execSQL(createAlarmTableCommand);
+
     }
 
     // This is called if the database version number changes
@@ -80,10 +87,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public void addAlarmToDataBase(Alarm newAlarm){
-
         SQLiteDatabase database = this.getWritableDatabase();
        database.insert(ALARM_TABLE, null, getAllContentValues(newAlarm));
-
     }
 
 
@@ -104,17 +109,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 int minute = cursor.getInt(3);
                 String name = cursor.getString(4);
                 String mission = cursor.getString(5);
-                boolean sunday = (cursor.getInt(6) == 1) ? true : false;
-                boolean monday = (cursor.getInt(7) == 1) ? true : false;
-                boolean tuesday = (cursor.getInt(8) == 1) ? true : false;
-                boolean wednesday = (cursor.getInt(9) == 1) ? true : false;
-                boolean thursday = (cursor.getInt(10) == 1) ? true : false;
-                boolean friday = (cursor.getInt(11) == 1) ? true : false;
-                boolean saturday = (cursor.getInt(12) == 1) ? true : false;
-                boolean hasSound = (cursor.getInt(13) == 1) ? true : false;
-                boolean hasVibrate = (cursor.getInt(14) == 1) ? true : false;
-                boolean hasMission = (cursor.getInt(15) == 1) ? true : false;
-                boolean hasContacts = (cursor.getInt(16) == 1) ? true : false;
+                String soundName = cursor.getString(6);
+                boolean sunday = (cursor.getInt(7) == 1) ? true : false;
+                boolean monday = (cursor.getInt(8) == 1) ? true : false;
+                boolean tuesday = (cursor.getInt(9) == 1) ? true : false;
+                boolean wednesday = (cursor.getInt(10) == 1) ? true : false;
+                boolean thursday = (cursor.getInt(11) == 1) ? true : false;
+                boolean friday = (cursor.getInt(12) == 1) ? true : false;
+                boolean saturday = (cursor.getInt(13) == 1) ? true : false;
+                boolean hasSound = (cursor.getInt(14) == 1) ? true : false;
+                boolean hasVibrate = (cursor.getInt(15) == 1) ? true : false;
+                boolean hasMission = (cursor.getInt(16) == 1) ? true : false;
+                boolean hasContacts = (cursor.getInt(17) == 1) ? true : false;
 
 
                 Alarm newAlarm = new Alarm(
@@ -123,6 +129,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                         minute,
                         name,
                         mission,
+                        soundName,
                         sunday,
                         monday,
                         tuesday,
@@ -170,6 +177,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
+
     private ContentValues getAllContentValues(Alarm newAlarm){
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ALARM_ACTIVE, newAlarm.isActive());
@@ -177,6 +185,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_ALARM_MINUTE, newAlarm.getMinute());
         contentValues.put(COLUMN_ALARM_NAME, newAlarm.getName());
         contentValues.put(COLUMN_ALARM_MISSION, newAlarm.getMission());
+        contentValues.put(COLUMN_ALARM_SOUND_NAME, newAlarm.getSoundName());
         contentValues.put(COLUMN_ALARM_SUNDAY, newAlarm.isSunday());
         contentValues.put(COLUMN_ALARM_MONDAY, newAlarm.isMonday());
         contentValues.put(COLUMN_ALARM_TUESDAY, newAlarm.isTuesday());
@@ -188,6 +197,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_ALARM_HAS_VIBRATE, newAlarm.hasVibrate());
         contentValues.put(COLUMN_ALARM_HAS_MISSION, newAlarm.hasMission());
         contentValues.put(COLUMN_ALARM_HAS_CONTACTS, newAlarm.hasUseMyContacts());
+
         return contentValues;
     }
 

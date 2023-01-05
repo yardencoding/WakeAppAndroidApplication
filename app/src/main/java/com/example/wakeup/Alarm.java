@@ -30,7 +30,7 @@ public class Alarm implements Parcelable {
     //Alarm fields
     private int id;
     private String name;
-    private String mission;
+    private String mission, soundName;
     private int hour;
     private int minute;
     private boolean active;
@@ -40,7 +40,7 @@ public class Alarm implements Parcelable {
 
 
     // initialize alarm with id, name, mission, hour, minute and which days it will run
-    public Alarm(boolean active, int hour, int minute, String name, String mission,
+    public Alarm(boolean active, int hour, int minute, String name, String mission, String soundName,
                  boolean sunday,
                  boolean monday,
                  boolean tuesday,
@@ -60,6 +60,7 @@ public class Alarm implements Parcelable {
         this.minute = minute;
         this.name = name;
         this.mission = mission;
+        this.soundName = soundName;
         this.sunday = sunday;
         this.monday = monday;
         this.tuesday = tuesday;
@@ -188,6 +189,14 @@ public class Alarm implements Parcelable {
 
     public boolean hasMission() {return hasMission;}
 
+    public String getSoundName() {
+        return soundName;
+    }
+
+    public void setSoundName(String soundName) {
+        this.soundName = soundName;
+    }
+
     public boolean hasUseMyContacts() {return hasUseMyContacts;}
 
     public void setHasSound(boolean hasSound) {this.hasSound = hasSound;}
@@ -197,6 +206,8 @@ public class Alarm implements Parcelable {
     public void setHasMission (boolean hasMission){this.hasMission = hasMission;}
 
     public void setHasUseMyContacts(boolean hasUseMyContacts) {this.hasUseMyContacts = hasUseMyContacts;}
+
+
 
 
     // Alarm methods:
@@ -424,6 +435,7 @@ public class Alarm implements Parcelable {
         id = in.readInt();
         name = in.readString();
         mission = in.readString();
+        soundName = in.readString();
         hour = in.readInt();
         minute = in.readInt();
         sunday = in.readByte() != 0;
@@ -462,6 +474,7 @@ public class Alarm implements Parcelable {
         parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeString(mission);
+        parcel.writeString(soundName);
         parcel.writeInt(hour);
         parcel.writeInt(minute);
         parcel.writeByte((byte) (sunday ? 1 : 0));

@@ -1,13 +1,16 @@
 package com.example.wakeup;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,14 +32,18 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private ToggleButton sunday, monday, tuesday, wednesday, thursday,
             friday, saturday;
     private EditText alarmName;
-    private TextView alarmMissionName;
+    private TextView alarmMissionName, alarmSoundName;
+    ;
     private ImageButton saveImageButton;
     private Switch soundSwitch, vibrateSwitch, missionSwitch, useMyContactsSwitch;
     private Button chooseSoundButton, missionButton, useContactsButton;
-    private ConstraintLayout createAlarmLayout;
-
-
+    private ActivityResultLauncher activityResultLauncher;
     private boolean hasSelectedTime = false;
+
+    //To store the sound name in SharedPreferences
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String SOUND_NAME = "SOUND_NAME";
+
 
 
     @Override
@@ -47,7 +54,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         timeButton = findViewById(R.id.choose_time_btn);
         timeButton.setOnClickListener(this);
 
-        saveImageButton = findViewById(R.id.alarm_save_imageButton);
+        saveImageButton = findViewById(R.id.save_soundImageButton);
         saveImageButton.setOnClickListener(this);
 
         chooseSoundButton = findViewById(R.id.alarm_song_btn);
@@ -68,16 +75,24 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         saturday = findViewById(R.id.saturday_tb);
         alarmName = findViewById(R.id.alarm_name_editText);
         alarmMissionName = findViewById(R.id.mission_name_tv);
+        alarmSoundName = findViewById(R.id.song_name_tv);
         soundSwitch = findViewById(R.id.alarm_sound_switch);
         vibrateSwitch = findViewById(R.id.alarm_vibrate_switch);
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
 
-        createAlarmLayout = findViewById(R.id.f1);
 
         //If we opened this activity through an alarm click,
         // change fields values to the corresponding clickedAlarm values.
         alarmWasClicked();
+
+        //Retrieve the sound name from ChooseSound activity.
+        initializeResultActivity();
+
+        if(getClickedAlarm() == null){
+            loadDataFromSharedPreferences();
+            alarmSoundName.setText(loadDataFromSharedPreferences());
+        }
     }
 
 
@@ -107,10 +122,23 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-
-        return super.dispatchKeyEvent(event);
+    private void initializeResultActivity() {
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        //This function gets called when we open this activity through ChooseSound activity.
+                        if (result.getResultCode() == 1) {
+                            Intent intent = result.getData();
+                            if (intent != null) {
+                                //Extract data from ChooseSound activity
+                                String soundName = intent.getStringExtra("resultText");
+                                int soundId = intent.getIntExtra("resultId", 0); //Will be used when creating alarm.
+                                alarmSoundName.setText(soundName);
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
@@ -121,10 +149,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         else if (view.getId() == chooseSoundButton.getId()) {
             Intent goToChooseSound = new Intent(this, ChooseSound.class);
-            startActivity(goToChooseSound);
-        }
+            Intent intent = new Intent();
+            intent.putExtra("soundName", alarmSoundName.getText().toString());
+            activityResultLauncher.launch(goToChooseSound);
 
-       else if (getClickedAlarm() == null && hasSelectedTime == false) {
+        } else if (getClickedAlarm() == null && hasSelectedTime == false) {
             // Check if time was selected, When we opened this activity through add button.
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
             return; //To not create an alarm
@@ -134,12 +163,14 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
             String name = alarmName.getText().toString();
             String mission = alarmMissionName.getText().toString();
+            String soundName = alarmSoundName.getText().toString();
             Alarm newAlarm = new Alarm(
                     true,
                     hour,
                     minute,
                     name,
                     mission,
+                    soundName,
                     sunday.isChecked(),
                     monday.isChecked(),
                     tuesday.isChecked(),
@@ -156,12 +187,14 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             if (newAlarm.hasNoChosenDay())
                 newAlarm.whenNoDay_WasChosen();
 
-
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
+            //Save sound name to SharedPreferences
+            saveSoundName();
+
             // go to the first activity
-            Intent goToNainScreen = new Intent(this, MainScreen.class);
-            startActivity(goToNainScreen);
+            Intent goToMainScreen = new Intent(this, MainScreen.class);
+            startActivity(goToMainScreen);
         }
     }
 
@@ -176,6 +209,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             timeButton.setText(String.format("%02d:%02d", hour, minute));
             alarmName.setText(clickedAlarm.getName());
             alarmMissionName.setText(clickedAlarm.getMission());
+            alarmSoundName.setText(clickedAlarm.getSoundName());
             sunday.setChecked(clickedAlarm.isSunday());
             monday.setChecked(clickedAlarm.isMonday());
             tuesday.setChecked(clickedAlarm.isTuesday());
@@ -219,6 +253,20 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             //Toast message that says alarm already exist
             Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_LONG).show();
         }
+    }
+
+    //sharedPreferences setup
+    private void saveSoundName() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SOUND_NAME, alarmSoundName.getText().toString());
+        editor.apply();
+    }
+
+    private String loadDataFromSharedPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String defaultStringValue = "Homecoming";
+        return sharedPreferences.getString(SOUND_NAME, defaultStringValue);
     }
 
 

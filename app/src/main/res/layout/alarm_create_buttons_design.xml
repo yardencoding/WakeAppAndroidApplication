@@ -194,7 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="25dp"
                 android:contentDescription="go to alarm setting"
-                android:text=" צילום פנים רטובות"
+                android:text=" צילום חיוך"
                 android:textColor="@color/light_blue"
                 android:textStyle="italic"
                 app:layout_constraintBottom_toBottomOf="@+id/alarm_mission_btn"

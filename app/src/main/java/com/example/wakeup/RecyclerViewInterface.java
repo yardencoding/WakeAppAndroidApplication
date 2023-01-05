@@ -1,6 +1,7 @@
 package com.example.wakeup;
 
- interface RecyclerViewInterface {
-     void onItemLongClick(int position);
-     void onItemClick(int position);
+public interface RecyclerViewInterface {
+    public void onItemClick(int position);
+    public void onItemLongClick(int position);
+
 }

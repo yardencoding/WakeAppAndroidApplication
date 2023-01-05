@@ -1,46 +1,45 @@
 package com.example.wakeup;
 
 
+import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
-public class ChooseSound extends AppCompatActivity implements View.OnClickListener, RecyclerViewInterface {
+public class ChooseSound extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageButton play, pause, volume;
+    private ImageButton play, pause, volume, saveSound;
     private Slider soundSlider;
-    private RecyclerView recyclerView;
     private RadioButton clickedRadioButton;
-    private LinkedHashMap<String, Integer> soundNameMap;
-    private ArrayList<RadioButton> radioButtonList;
-    private ChooseSoundAdapter adapter;
+    private RadioGroup radioGroup;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
     private int maxAlarmStreamVolume;
-    private boolean isMediaPlayerPaused;
+
+
+    private int pausedRadioButtonId = 0;
+    private boolean isMediaPlayerPaused = false;
+        /*
+        The purpose of those variables is to make sure that when I pause a sound,
+        and start it again it will continue from the time it was paused.
+         */
 
 
     @Override
@@ -48,14 +47,28 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.choose_sound);
 
+        //RadioGroup
+        radioGroup = findViewById(R.id.sound_names_radioGroup);
+        //Get the id of the clicked radioButton
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                clickedRadioButton = findViewById(checkedId);
+
+            }
+        });
+
+
         //ImageButtons
         play = findViewById(R.id.play_audio_button);
         pause = findViewById(R.id.pause_audio_button);
         volume = findViewById(R.id.volume_image_button);
+        saveSound = findViewById(R.id.save_sound_image_button);
 
         play.setOnClickListener(this);
         pause.setOnClickListener(this);
         volume.setOnClickListener(this);
+        saveSound.setOnClickListener(this);
 
 
         //Slider
@@ -69,85 +82,57 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 60 / (100 / maxAlarmStreamVolume), 0);
 
 
-        //Create a map with the corresponding song and song name
-        soundNameMap = createSoundNameMap();
-        radioButtonList = getRadioButtonList();
-
-
-        //Recyclerview
-        recyclerView = findViewById(R.id.sound_names_recyclerView);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new ChooseSoundAdapter(radioButtonList, this);
-        recyclerView.setAdapter(adapter);
-
-        //Add space to recyclerview items.
-        DividerItemDecoration itemDecorationSpace = new DividerItemDecoration(recyclerView.getContext()
-                , DividerItemDecoration.VERTICAL);
-        itemDecorationSpace.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider_space_choose_sound)
-        );
-        //Add 7dp space between recyclerview items.
-        recyclerView.addItemDecoration(itemDecorationSpace);
-
         //Initialize a MediaPlayer obj with audio attributes.
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build());
 
+        searchForRadioButton_WithSameSoundName();
     }
 
-    // To hide hardware volume buttons
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
 
-        int steps = 5;
-        if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP){
-              soundSlider.setValue(soundSlider.getValue() + steps);
-            return true;
+    private void searchForRadioButton_WithSameSoundName() {
+        /*
+        Searching through RadioGroup to find the RadioButton with the same sound name
+        as CreateAlarm sound name and set him to TRUE.
+         */
+        Intent intentFromCreateAlarm = getIntent();
+        String text = intentFromCreateAlarm.getStringExtra("soundName");
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            RadioButton radioButtonWithTheSameSoundName = (RadioButton) radioGroup.getChildAt(i);
+            if (radioButtonWithTheSameSoundName.getText().toString().equals(text))
+                radioButtonWithTheSameSoundName.setChecked(true);
         }
+    }
 
-        if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN){
-            soundSlider.setValue(soundSlider.getValue() - steps);
-            return true;
+    private int getSoundID(String soundId) {
+        switch (soundId) {
+            case "Door knock":
+                return R.raw.door_knock;
+            case "Heaven":
+                return R.raw.heaven;
+            case "Homecoming":
+                return R.raw.homecoming;
+            case "Kokuriko":
+                return R.raw.kokuriko;
+            case "Landscape":
+                return R.raw.land_scape;
+            case "Minion wake up":
+                return R.raw.minion_wakeup;
+            case "Piano":
+                return R.raw.piano;
+            case "Powerful":
+                return R.raw.powerful;
+            case "Scary":
+                return R.raw.scary;
+            case "Super spiffy":
+                return R.raw.super_spiffy;
+            default: //Invalid sound name
+                return -1;
         }
-
-        return super.dispatchKeyEvent(event);
     }
 
-    private LinkedHashMap<String, Integer> createSoundNameMap() {
-        LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
-        map.put("Door knock", R.raw.door_knock);
-        map.put("Heaven", R.raw.heaven);
-        map.put("Homecoming", R.raw.homecoming);
-        map.put("Inspiration", R.raw.inspiration);
-        map.put("Israel siren", R.raw.israel_siren);
-        map.put("Kokuriko", R.raw.kokuriko);
-        map.put("Landscape", R.raw.land_scape);
-        map.put("Minion wake up", R.raw.minion_wakeup);
-        map.put("Piano", R.raw.piano);
-        map.put("Powerful", R.raw.powerful);
-        map.put("Sad trombone", R.raw.sad_trombone_);
-        map.put("Scary", R.raw.scary);
-        map.put("Super spiffy", R.raw.super_spiffy);
-        map.put("The pirats", R.raw.the_pirats);
-        return map;
-    }
-
-    private ArrayList<RadioButton> getRadioButtonList() {
-
-        ArrayList<RadioButton> list = new ArrayList<>();
-
-        //Iterate over soundNameMap to create a new RadioButton with the corresponding sound name.
-        for (int i = 0; i < soundNameMap.size(); i++) {
-
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(soundNameMap.keySet().toArray()[i].toString());
-            list.add(radioButton);
-        }
-
-        return list;
-    }
 
     private void initializeSliderListeners() {
 
@@ -188,7 +173,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
                     soundSlider.setValue(newValue);
                 }
                 // checks if the newValue is greater than the maximum slider value.
-                if(newValue > 100) {
+                if (newValue > 100) {
                     newValue = 100;
                     soundSlider.setValue(newValue);
                 }
@@ -203,22 +188,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        if (view.getId() == play.getId() || view.getId() == pause.getId())
-            if (clickedRadioButton == null) {
-                Toast.makeText(this, "לא נבחר צלצול", Toast.LENGTH_SHORT).show();
-                return; //Exit. radio button is not checked.
-            }
-
-
         //Clicked play button
         if (view.getId() == play.getId()) {
-
-            //If I play the song after pausing it.
-            if (isMediaPlayerPaused == true) {
-                mediaPlayer.start();
-                isMediaPlayerPaused = false;
-                return;
-            }
 
             //If I change the song name when the song is playing, Stop the previous song.
             if (mediaPlayer.isPlaying()) {
@@ -226,10 +197,23 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
                 mediaPlayer.reset();
             }
 
-            String key = clickedRadioButton.getText().toString();
+            //If I start a sound after pressing the pause button.
+            if (isMediaPlayerPaused == true) {
+                isMediaPlayerPaused = false;
+                //Check if I play the same sound that was paused.
+                if (pausedRadioButtonId == clickedRadioButton.getId()) {
+                    mediaPlayer.start();
+                    return;
+                }
+                //If I player another sound
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+
+            }
+
             try {
                 //Set mediaPlayer sound
-                mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + soundNameMap.get(key)));
+                mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + getSoundID(clickedRadioButton.getText().toString())));
                 mediaPlayer.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -238,100 +222,54 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
             mediaPlayer.start();
 
 
-            //Pause button is clicked
         } else if (view.getId() == pause.getId()) {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
                 isMediaPlayerPaused = true;
+                pausedRadioButtonId = clickedRadioButton.getId();
             }
 
+        } else if (view.getId() == volume.getId()) {
             //Volume button is clicked.
-        } else {
             // Change slider value to the minimum device volume(6).
             soundSlider.setValue(6);
+        } else {
+            //Save button was clicked.
+            Intent goToCreateAlarm = new Intent(this, CreateAlarm.class);
+            goToCreateAlarm.putExtra("resultText", clickedRadioButton.getText());
+            goToCreateAlarm.putExtra("resultId", getSoundID(clickedRadioButton.getText().toString()));
+
+            setResult(1, goToCreateAlarm);
+            super.onBackPressed();
         }
     }
 
 
+    // To hide hardware volume buttons
     @Override
-    public void onItemClick(int position) {
-        adapter.notifyItemChanged(adapter.copyLastCheckedPosition);
-        adapter.notifyItemChanged(adapter.lastCheckedPosition);
+    public boolean dispatchKeyEvent(KeyEvent event) {
 
-        clickedRadioButton = radioButtonList.get(position);
+        int steps = 5;
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+            soundSlider.setValue(soundSlider.getValue() + steps);
+            return true; // Meaning I handled that event
+        }
 
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            soundSlider.setValue(soundSlider.getValue() - steps);
+            return true;// Meaning I handled that event
+        }
+
+        return super.dispatchKeyEvent(event);
     }
 
-    //Don't need
+    //If back button was pressed update soundId in database.
     @Override
-    public void onItemLongClick(int position) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        }
+        return super.onKeyDown(keyCode, event);
     }
-
-
-
-
-    //Recyclerview Adapter + ViewHolder
-    private class ChooseSoundAdapter extends RecyclerView.Adapter<ChooseSoundAdapter.ChooseSoundViewHolder> {
-
-        private RecyclerViewInterface recyclerViewInterface;
-        private ArrayList<RadioButton> radioButtonList;
-        private int lastCheckedPosition = -1;
-        private int copyLastCheckedPosition;
-
-
-        public ChooseSoundAdapter(ArrayList<RadioButton> radioButtonList, RecyclerViewInterface recyclerViewInterface) {
-            this.radioButtonList = radioButtonList;
-            this.recyclerViewInterface = recyclerViewInterface;
-        }
-
-
-        class ChooseSoundViewHolder extends RecyclerView.ViewHolder {
-            RadioButton radioButton;
-
-            public ChooseSoundViewHolder(View itemView) {
-                super(itemView);
-                radioButton = itemView.findViewById(R.id.choose_sound_radioButton);
-
-                radioButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = getAdapterPosition();
-                        if (recyclerViewInterface != null && position != RecyclerView.NO_POSITION) {
-
-                            copyLastCheckedPosition = lastCheckedPosition;
-                            lastCheckedPosition = position;
-
-                            recyclerViewInterface.onItemClick(position);
-                        }
-                    }
-                });
-
-            }
-        }
-
-        @NonNull
-        @Override
-        public ChooseSoundViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.choose_sound_reyclerview_item, parent, false);
-            return new ChooseSoundViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ChooseSoundViewHolder holder, int position) {
-            RadioButton currentRadioButton = radioButtonList.get(position);
-            holder.radioButton.setText(currentRadioButton.getText());
-            holder.radioButton.setChecked(position == lastCheckedPosition);
-        }
-
-        @Override
-        public int getItemCount() {
-            return radioButtonList.size();
-        }
-
-
-    }
-
 
     @Override
     public void onDestroy() {

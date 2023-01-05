@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChooseSound"
-    android:layoutDirection="ltr"
     android:background="@color/background_color"
-    >
+    android:layoutDirection="ltr"
+    tools:context=".ChooseSound">
 
 
     <TextView
@@ -21,25 +20,107 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sound_names_recyclerView"
+
+    <RadioGroup
+        android:id="@+id/sound_names_radioGroup"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:layout_marginTop="15dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:layoutDirection="rtl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choose_sound_textview" />
+        app:layout_constraintTop_toBottomOf="@+id/choose_sound_textview">
+
+        <RadioButton
+            android:id="@+id/door_knock_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Door knock"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/heaven_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Heaven"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/homecoming_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Homecoming"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+
+        <RadioButton
+            android:id="@+id/kokuriko_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kokuriko"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/landscape_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Landscape"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/minion_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Minion wake up"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/powerful_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Powerful"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+        <RadioButton
+            android:id="@+id/scary_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scary"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize"
+
+            />
+
+        <RadioButton
+            android:id="@+id/Super_spiffy_RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Super spiffy"
+            android:textColor="@color/light_blue"
+            android:textSize="@dimen/radioGroupTextSize" />
+
+
+    </RadioGroup>
+
 
     <ImageButton
         android:id="@+id/play_audio_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="15dp"
         android:background="@color/transparent"
         android:contentDescription="play audio"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerView"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_radioGroup"
         app:srcCompat="@drawable/play" />
 
     <ImageButton
@@ -47,28 +128,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:background="@color/transparent"
         android:contentDescription="pause audio"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_recyclerView"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_radioGroup"
         app:srcCompat="@drawable/pause" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/sound_slider"
-        android:layoutDirection="rtl"
-
-
-
-        android:valueFrom="0"
-        android:valueTo="100"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="70dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="28dp"
         android:contentDescription="control volume"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layoutDirection="rtl"
+        android:valueFrom="0"
+        android:valueTo="100"
+        app:layout_constraintBottom_toTopOf="@+id/save_sound_image_button"
         app:layout_constraintEnd_toEndOf="@+id/volume_image_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_audio_button" />
@@ -78,17 +156,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="25dp"
         android:background="@color/transparent"
         android:contentDescription="volume icon"
         android:minWidth="48dp"
         android:minHeight="48dp"
         android:src="@drawable/audio"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/save_sound_image_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sound_slider"
         app:layout_constraintTop_toBottomOf="@+id/play_audio_button" />
+
+    <ImageButton
+        android:id="@+id/save_sound_image_button"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="20dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="save the alarm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/checkmark" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

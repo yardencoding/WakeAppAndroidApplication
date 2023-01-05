@@ -122,9 +122,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         intent.putExtra("getClickedAlarm", clickedAlarm);
         //To check that I don't change alarm settings to an already existing alarm.
 
-        //Delete clicked alarm from list, because the values might be changed.
-        alarmList.remove(clickedAlarm);
-
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
 
         startActivity(intent);
