@@ -152,6 +152,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             goToChooseSound.putExtra("soundName", alarmSoundName.getText().toString());
             activityResultLauncher.launch(goToChooseSound);
 
+        } else if (view.getId() == useContactsButton.getId()){
+            Intent goToContact = new Intent(this, Contact.class);
+            startActivity(goToContact);
+
         } else if (getClickedAlarm() == null && hasSelectedTime == false) {
             // Check if time was selected, When we opened this activity through add button.
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();

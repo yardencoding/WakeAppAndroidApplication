@@ -10,12 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WakeUp">
         <activity
+            android:name=".Contact"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ChooseSound"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".CreateAlarm"
             android:exported="true" />
-    <activity
+        <activity
             android:name=".MainScreen"
             android:exported="true">
             <intent-filter>
