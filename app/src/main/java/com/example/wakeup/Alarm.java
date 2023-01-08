@@ -2,25 +2,15 @@ package com.example.wakeup;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Year;
-import java.time.chrono.ChronoLocalDate;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 // implements Parcelable, so that we can send our alarmList between activities
 public class Alarm implements Parcelable {
