@@ -16,8 +16,9 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="100dp"
         android:contentDescription="message to send"
-        android:text="אנשי קשר שתשלח להם הודעה להעיר אותך"
+        android:text="הוסף אנשי קשר"
         android:textSize="21sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,14 +45,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPhone4"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPhone3"
         app:srcCompat="@drawable/checkmark" />
 
     <EditText
         android:id="@+id/editTextPhone1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:ems="10"
         android:hint="איש קשר 1:"
         android:inputType="phone"
@@ -64,7 +65,7 @@
         android:id="@+id/editTextPhone2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:ems="10"
         android:hint="איש קשר 2:"
         android:inputType="phone"
@@ -77,7 +78,7 @@
         android:id="@+id/editTextPhone3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:ems="10"
         android:hint="איש קשר 3:"
         android:inputType="phone"
@@ -86,18 +87,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPhone2" />
 
-    <EditText
-        android:id="@+id/editTextPhone4"
+    <ImageButton
+        android:layoutDirection="ltr"
+        android:id="@+id/imageButton3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:ems="10"
-        android:hint="איש קשר 4:"
-        android:inputType="phone"
-        android:minHeight="48dp"
+        android:layout_marginStart="93dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPhone3" />
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
+        android:onClick="onBackIconContact"
+        app:srcCompat="@drawable/backicon"
+        tools:ignore="OnClick" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

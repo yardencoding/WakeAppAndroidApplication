@@ -282,4 +282,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         mediaPlayer.release();
         super.onDestroy();
     }
+
+    public void onBackIconChooseSound(View view) {
+        super.onBackPressed();
+    }
 }

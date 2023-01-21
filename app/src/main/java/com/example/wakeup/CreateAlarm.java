@@ -161,6 +161,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
             return; //To not create an alarm
 
+
         } else {
 
 
@@ -273,5 +274,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     }
 
 
+    public void onBackIconCreateAlarm(View view) {
+        super.onBackPressed();
+    }
 }
 

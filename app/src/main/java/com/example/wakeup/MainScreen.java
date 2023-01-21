@@ -154,5 +154,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
         startActivity(intent);
     }
+
 }
 
