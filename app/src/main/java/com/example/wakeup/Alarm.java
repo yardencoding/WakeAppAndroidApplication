@@ -1,5 +1,6 @@
 package com.example.wakeup;
 
+import android.app.AlarmManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 import java.time.DayOfWeek;
@@ -26,7 +27,6 @@ public class Alarm implements Parcelable {
     private boolean active;
     private boolean sunday, monday, tuesday, wednesday, thursday, friday, saturday;
     private boolean hasSound, hasVibrate, hasMission,hasUseMyContacts;
-
 
 
     // initialize alarm with id, name, mission, hour, minute and which days it will run
@@ -316,7 +316,7 @@ public class Alarm implements Parcelable {
 
     }
 
-    private LocalDateTime getAlarmLocalDateTime() {
+    public LocalDateTime getAlarmLocalDateTime() {
         LocalDateTime alarmLocalDateTime = LocalDateTime.now();
         //nextOrSame because if the day had already passed move to the next week,
         // and if not stay in this week.
@@ -326,9 +326,12 @@ public class Alarm implements Parcelable {
         return alarmLocalDateTime;
     }
 
+
+
     public void setActive(boolean active) {
         this.active = active;
     }
+
 
     public String getHowMuchTimeTillAlarm() {
 
@@ -402,6 +405,7 @@ public class Alarm implements Parcelable {
         }
         return firstActive;
     }
+
 
 
     // Returns true if the two alarms has the same Hour, Minute and Days.
@@ -528,6 +532,14 @@ public class Alarm implements Parcelable {
             // ^^ those are just examples
         }
     }
+
+
+
+
+
+
+
+
 
 
 }

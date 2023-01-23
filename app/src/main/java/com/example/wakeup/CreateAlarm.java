@@ -8,7 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,7 +26,11 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class CreateAlarm extends AppCompatActivity implements View.OnClickListener {
 
@@ -196,6 +203,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             //Save sound name to SharedPreferences
             saveSoundName();
 
+            //Start alarm
+            long milliseconds = newAlarm.getAlarmLocalDateTime().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000;
+            startAlarm(milliseconds);
+
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
             startActivity(goToMainScreen);
@@ -273,6 +284,19 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return sharedPreferences.getString(SOUND_NAME, defaultStringValue);
     }
 
+    public void startAlarm(long alarmTimeInMillis){
+
+        /*
+        if it's repeating alarm then alarmManager.setExact otherwise alarmManager.setRepeating
+         */
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+
+    }
 
     public void onBackIconCreateAlarm(View view) {
         super.onBackPressed();
