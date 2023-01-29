@@ -33,7 +33,6 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     private String loadedMessage, loadedPhoneNumber1, loadedPhoneNumber2, loadedPhoneNumber3;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +47,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
         saveContactsImageButton = findViewById(R.id.save_contactsImageButton);
         saveContactsImageButton.setOnClickListener(this);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)==PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_DENIED) {
             requestSendSmsPermission();
         }
 
@@ -63,8 +62,15 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     }
 
 
-
     private void sendSms() {
+
+        // To check if permission was granted
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) ==
+                PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(this, "ההרשאה לא אושרה", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
 
         String message = sendTextMessage.getText().toString();
@@ -77,7 +83,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             SmsManager sms = SmsManager.getDefault();
 
             //Sends to the first number isn't empty.
-            if(phoneNumber1.getText().toString().isEmpty()==false) {
+            if (phoneNumber1.getText().toString().isEmpty() == false) {
                 sms.sendTextMessage(
                         phoneNumber1.getText().toString(),
                         null,
@@ -87,7 +93,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the second number isn't empty.
-            if(phoneNumber2.getText().toString().isEmpty()==false) {
+            if (phoneNumber2.getText().toString().isEmpty() == false) {
                 sms.sendTextMessage(
                         phoneNumber2.getText().toString(),
                         null,
@@ -97,7 +103,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the third number isn't empty
-            if((phoneNumber3.getText().toString().isEmpty()==false)) {
+            if ((phoneNumber3.getText().toString().isEmpty() == false)) {
                 sms.sendTextMessage(
                         phoneNumber3.getText().toString(),
                         null,
@@ -110,48 +116,50 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
         saveDataToSharedPref();
         //Returns to CreateAlarm activity.
         super.onBackPressed();
+
+
     }
 
-    private void requestSendSmsPermission(){
+    private void requestSendSmsPermission() {
         ActivityCompat.requestPermissions(Contact.this, new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "ההרשאה אושרה", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "יש צורך בהרשאה לשליחת SMS כדי שההודעה תשלח" , Toast.LENGTH_SHORT).show();
-            }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "ההרשאה אושרה", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "יש צורך בהרשאה לשליחת SMS כדי שההודעה תשלח", Toast.LENGTH_SHORT).show();
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
-        @Override
-        public void onClick (View v){
+    @Override
+    public void onClick(View v) {
         //Save button
 
-            //Exit if all the numbers are empty
-            if(allNumbersAreEmpty()){
-                Toast.makeText(this, "לא בחרת איש קשר" , Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if(checkIfAllNone_EmptyNumbersAreValid() == true){
-                if(sendTextMessage.getText().toString().isEmpty() == false)
-                  sendSms();
-                else
-                    Toast.makeText(this, "הודעה ריקה" , Toast.LENGTH_SHORT).show();
-            } else
-                Toast.makeText(this, "מספר אחד או יותר לא תקינים" , Toast.LENGTH_SHORT).show();
-
-
+        //Exit if all the numbers are empty
+        if (allNumbersAreEmpty()) {
+            Toast.makeText(this, "לא בחרת איש קשר", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        if (checkIfAllNone_EmptyNumbersAreValid() == true) {
+            if (sendTextMessage.getText().toString().isEmpty() == false)
+                sendSms();
+            else
+                Toast.makeText(this, "הודעה ריקה", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "מספר אחד או יותר לא תקינים", Toast.LENGTH_SHORT).show();
 
-        private boolean allNumbersAreEmpty(){
+
+    }
+
+
+    private boolean allNumbersAreEmpty() {
         return phoneNumber1.getText().toString().isEmpty() &&
                 phoneNumber2.getText().toString().isEmpty() && phoneNumber3.getText().toString().isEmpty();
-        }
+    }
 
     private boolean checkIfAllNone_EmptyNumbersAreValid() {
 
@@ -161,23 +169,23 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
 
         //To change the color of the EditText to red if the number isn't empty and isn't israeli.
-        if(phoneNumber1.getText().toString().isEmpty() == false){
+        if (phoneNumber1.getText().toString().isEmpty() == false) {
 
-            if(phoneNumber1.getText().toString().matches(regex) == false) {
+            if (phoneNumber1.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
 
-        if(phoneNumber2.getText().toString().isEmpty() == false){
+        if (phoneNumber2.getText().toString().isEmpty() == false) {
 
-            if(phoneNumber2.getText().toString().matches(regex) == false) {
+            if (phoneNumber2.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
 
-        if(phoneNumber3.getText().toString().isEmpty() == false){
+        if (phoneNumber3.getText().toString().isEmpty() == false) {
 
-            if(phoneNumber3.getText().toString().matches(regex) == false) {
+            if (phoneNumber3.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
@@ -198,7 +206,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     }
 
     //To retrieve the message and phone numbers from shared preference.
-    private void  loadDataFromSharedPref(){
+    private void loadDataFromSharedPref() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         loadedMessage = sharedPreferences.getString(MESSAGE, "");
         loadedPhoneNumber1 = sharedPreferences.getString(PHONE_NUMBER_1, "");

@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -34,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CreateAlarm extends AppCompatActivity implements View.OnClickListener {
 
+
     private Button timeButton;
     private int hour = 6, minute = 0;
     private ToggleButton sunday, monday, tuesday, wednesday, thursday,
@@ -57,6 +60,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alarm);
+
+
 
         timeButton = findViewById(R.id.choose_time_btn);
         timeButton.setOnClickListener(this);
@@ -100,6 +105,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             loadDataFromSharedPreferences();
             alarmSoundName.setText(loadDataFromSharedPreferences());
         }
+
     }
 
 
@@ -204,7 +210,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             saveSoundName();
 
             //Start alarm
-            long milliseconds = newAlarm.getAlarmLocalDateTime().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000;
+            long milliseconds = newAlarm.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             startAlarm(milliseconds);
 
             // go to the first activity
@@ -300,6 +306,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     public void onBackIconCreateAlarm(View view) {
         super.onBackPressed();
+    }
+
+    private void createNotificationChannel(){
+        CharSequence name = "showAlarmNotificationName";
+        String description = "channel for Alarm Manager";
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel(getString(R.string.CHANNEL_ID), name, importance);
+        channel.setDescription(description);
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+
     }
 }
 
