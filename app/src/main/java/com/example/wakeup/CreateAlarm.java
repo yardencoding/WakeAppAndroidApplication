@@ -62,7 +62,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_alarm);
 
 
-
         timeButton = findViewById(R.id.choose_time_btn);
         timeButton.setOnClickListener(this);
 
@@ -308,15 +307,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         super.onBackPressed();
     }
 
-    private void createNotificationChannel(){
-        CharSequence name = "showAlarmNotificationName";
-        String description = "channel for Alarm Manager";
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(getString(R.string.CHANNEL_ID), name, importance);
-        channel.setDescription(description);
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
 
-    }
 }
 
