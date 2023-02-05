@@ -1,10 +1,14 @@
 package com.example.wakeup;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -62,6 +66,9 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
 
         updateFirstMessage_thread();
+
+        //Request showing notification permission.
+        requestNotificationPermission();
     }
 
 
@@ -70,7 +77,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     public void updateFirstMessage_thread() {
         final int MILLISECONDS_TO_SLEEP = 100; //So it does not freeze the UI
-            updateAlarmTime_thread = new Thread() {
+        updateAlarmTime_thread = new Thread() {
             public void run() {
                 while (Thread.currentThread().isInterrupted() == false) {
 
@@ -92,8 +99,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         };
         updateAlarmTime_thread.start();
     }
-
-
 
 
     @Override
@@ -127,7 +132,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         startActivity(intent);
     }
 
-    private void changeFirstMessageToAlarmTime(){
+    private void changeFirstMessageToAlarmTime() {
         Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
         if (alarm != null) {
             firstMessage.setText(alarm.getHowMuchTimeTillAlarm());
@@ -155,5 +160,12 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         startActivity(intent);
     }
 
-}
+    private void requestNotificationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_DENIED
+        )
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
+        }
+    }
 

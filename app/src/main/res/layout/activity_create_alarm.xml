@@ -47,7 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/include_daypicker" />
 
     <ImageButton
-        android:id="@+id/save_soundImageButton"
+        android:id="@+id/save_alarm_ImageButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:background="@android:color/transparent"
@@ -60,7 +60,7 @@
         />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/backIconCreateAlarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"

@@ -23,30 +23,33 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        createNotification(context);
+        createNotification(context, intent.getStringExtra("TITLE"));
     }
 
 
-    public  void createNotification(Context context) {
+    public  void createNotification(Context context, String title) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //Notification channel
+        //Notification channel, needed for sdk 26 and above
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Alarm ring", NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.GREEN);
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
 
+
+            if(title.isEmpty())
+                title = "התראה";
+
         //Notification body
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_launcher_background);
-        builder.setContentTitle("התראה");
+        builder.setContentTitle(title);
         builder.setContentText(getCurrentHourAndMinute());
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setAutoCancel(true);
+        notificationManager.notify(1, builder.build());
 
-        Notification notification = builder.build();
-        notificationManager.notify(1, notification);
     }
 
     private String getCurrentHourAndMinute(){

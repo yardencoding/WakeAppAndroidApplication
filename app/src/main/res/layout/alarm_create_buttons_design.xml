@@ -46,13 +46,13 @@
                 android:clickable="true"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
-                app:layout_constraintBottom_toBottomOf="@+id/alarm_song_btn"
+                app:layout_constraintBottom_toBottomOf="@+id/alarm_sound_btn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/alarm_song_btn"
+                app:layout_constraintTop_toTopOf="@+id/alarm_sound_btn"
                 />
 
             <Button
-                android:id="@+id/alarm_song_btn"
+                android:id="@+id/alarm_sound_btn"
                 android:layout_width="330dp"
                 android:layout_height="65dp"
                 android:layout_marginStart="40dp"
@@ -77,8 +77,8 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="@+id/alarm_song_btn"
-                app:layout_constraintTop_toTopOf="@+id/alarm_song_btn" />
+                app:layout_constraintEnd_toEndOf="@+id/alarm_sound_btn"
+                app:layout_constraintTop_toTopOf="@+id/alarm_sound_btn" />
 
             <TextView
                 android:id="@+id/song_name_tv"
@@ -88,8 +88,8 @@
                 android:text="Homecoming"
                 android:textColor="@color/light_blue"
                 android:textStyle="italic"
-                app:layout_constraintBottom_toBottomOf="@+id/alarm_song_btn"
-                app:layout_constraintEnd_toEndOf="@+id/alarm_song_btn"
+                app:layout_constraintBottom_toBottomOf="@+id/alarm_sound_btn"
+                app:layout_constraintEnd_toEndOf="@+id/alarm_sound_btn"
                 app:layout_constraintTop_toBottomOf="@+id/alarm_song_title_tv" />
 
             <Button
@@ -104,7 +104,7 @@
                 android:contentDescription="go to alarm settings"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/alarm_vibrate_switch"
-                app:layout_constraintTop_toBottomOf="@+id/alarm_song_btn" />
+                app:layout_constraintTop_toBottomOf="@+id/alarm_sound_btn" />
 
             <View
                 android:id="@+id/divider1"
@@ -116,7 +116,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/alarm_vibrate_btn"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/alarm_song_btn" />
+                app:layout_constraintTop_toBottomOf="@+id/alarm_sound_btn" />
 
             <Switch
                 android:id="@+id/alarm_vibrate_switch"

@@ -7,7 +7,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,6 +18,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -65,10 +68,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         timeButton = findViewById(R.id.choose_time_btn);
         timeButton.setOnClickListener(this);
 
-        saveImageButton = findViewById(R.id.save_soundImageButton);
+        saveImageButton = findViewById(R.id.save_alarm_ImageButton);
         saveImageButton.setOnClickListener(this);
 
-        chooseSoundButton = findViewById(R.id.alarm_song_btn);
+        chooseSoundButton = findViewById(R.id.alarm_sound_btn);
         chooseSoundButton.setOnClickListener(this);
 
         missionButton = findViewById(R.id.alarm_mission_btn);
@@ -156,27 +159,32 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        if (view.getId() == timeButton.getId())
-            popTimePicker();
+        switch(view.getId()){
+            case R.id.choose_time_btn:
+                popTimePicker();
+                break;
+            case R.id.alarm_sound_btn:
+                Intent goToChooseSound = new Intent(this, ChooseSound.class);
+                goToChooseSound.putExtra("soundName", alarmSoundName.getText().toString());
+                activityResultLauncher.launch(goToChooseSound);
+                break;
 
-        else if (view.getId() == chooseSoundButton.getId()) {
-            Intent goToChooseSound = new Intent(this, ChooseSound.class);
-            goToChooseSound.putExtra("soundName", alarmSoundName.getText().toString());
-            activityResultLauncher.launch(goToChooseSound);
+            case R.id.alarm_contacts_btn:
+                Intent goToContact = new Intent(this, Contact.class);
+                startActivity(goToContact);
+                break;
 
-        } else if (view.getId() == useContactsButton.getId()){
-            Intent goToContact = new Intent(this, Contact.class);
-            startActivity(goToContact);
+            case R.id.save_alarm_ImageButton:
+                createAlarm();
+        }
 
-        } else if (getClickedAlarm() == null && hasSelectedTime == false) {
-            // Check if time was selected, When we opened this activity through add button.
-            Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
-            return; //To not create an alarm
+    }
 
+    private void createAlarm() {
 
-        } else {
+        if(postNotificationWasGranted() && timeWasChosen()){
 
-
+            //Create Alarm fields
             String name = alarmName.getText().toString();
             String mission = alarmMissionName.getText().toString();
             String soundName = alarmSoundName.getText().toString();
@@ -208,15 +216,37 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             //Save sound name to SharedPreferences
             saveSoundName();
 
-            //Start alarm
-            long milliseconds = newAlarm.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            startAlarm(milliseconds);
+            // schedule the alarm
+            scheduleAlarm(newAlarm);
 
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
             startActivity(goToMainScreen);
+
         }
     }
+
+    private boolean timeWasChosen() {
+        if (getClickedAlarm() == null && hasSelectedTime == false) {
+            // Check if time was selected, When we opened this activity through add button.
+            Toast.makeText(this, "לא הוגדרה שעה", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean postNotificationWasGranted() {
+        //Check if POST_NOTIFICATION permission was granted, if not Return.
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(this, "על מנת ליצור התראה יש צורך בהרשאה להצגת התראות", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+
 
 
     //Set CreateAlarm fields to the corresponding clickedAlarm fields.
@@ -289,17 +319,26 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return sharedPreferences.getString(SOUND_NAME, defaultStringValue);
     }
 
-    public void startAlarm(long alarmTimeInMillis){
+    public void scheduleAlarm(Alarm alarm){
 
-        /*
-        if it's repeating alarm then alarmManager.setExact otherwise alarmManager.setRepeating
-         */
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_IMMUTABLE);
+        intent.putExtra("HAS_SOUND_ACTIVE", alarm.hasSound());
+        intent.putExtra("HAS_VIBRATE_ACTIVE", alarm.hasVibrate());
+        intent.putExtra("HAS_USE_CONTACTS_ACTIVE", alarm.hasUseMyContacts());
+        intent.putExtra("HAS_MISSION_ACTIVE", alarm.hasMission());
+        intent.putExtra("TITLE", alarm.getName());
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+        long milliseconds = alarm.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int)milliseconds, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        if(alarm.isRecurring() == false)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milliseconds, pendingIntent);
+        /*
+        else
+        handle recurring alarms
+         */
 
     }
 
