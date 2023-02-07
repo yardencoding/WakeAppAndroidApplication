@@ -53,10 +53,12 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private ActivityResultLauncher activityResultLauncher;
     private boolean hasSelectedTime = false;
 
+
     //To store the sound name in SharedPreferences
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String SOUND_NAME = "SOUND_NAME";
 
+    private  int soundId;
 
 
     @Override
@@ -148,7 +150,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                             if (intent != null) {
                                 //Extract data from ChooseSound activity
                                 String soundName = intent.getStringExtra("resultText");
-                                int soundId = intent.getIntExtra("resultId", 0); //Will be used when creating alarm.
+                                 soundId = intent.getIntExtra("resultId", 0); //Will be used when creating alarm.
                                 alarmSoundName.setText(soundName);
                             }
                         }
@@ -324,11 +326,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra("HAS_SOUND_ACTIVE", alarm.hasSound());
-        intent.putExtra("HAS_VIBRATE_ACTIVE", alarm.hasVibrate());
-        intent.putExtra("HAS_USE_CONTACTS_ACTIVE", alarm.hasUseMyContacts());
-        intent.putExtra("HAS_MISSION_ACTIVE", alarm.hasMission());
-        intent.putExtra("TITLE", alarm.getName());
+        intent.putExtra("runningAlarm", alarm);
+        intent.putExtra("soundId", soundId);
+
 
         long milliseconds = alarm.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int)milliseconds, intent, PendingIntent.FLAG_IMMUTABLE);

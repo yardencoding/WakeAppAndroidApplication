@@ -1,6 +1,5 @@
 package com.example.wakeup;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,22 +7,29 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
-import android.widget.Toast;
+import android.media.AudioAttributes;
+import android.media.MediaPlayer;
+import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
     private static final String CHANNEL_ID = "alarmNotificationId";
-
+    private Alarm alarm;
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        createNotification(context, intent.getStringExtra("TITLE"));
+
+        alarm = intent.getParcelableExtra("runningAlarm");
+        createNotification(context, intent.getStringExtra(alarm.getName()));
+
+        playSound(intent.getIntExtra("soundId", 0), context);
+
+
+
     }
 
 
@@ -37,25 +43,40 @@ public class AlarmReceiver extends BroadcastReceiver {
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
 
-
-            if(title.isEmpty())
-                title = "התראה";
-
         //Notification body
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_launcher_background);
-        builder.setContentTitle(title);
-        builder.setContentText(getCurrentHourAndMinute());
+        builder.setContentTitle("התראה..");
+        builder.setContentText(title);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setAutoCancel(true);
-        notificationManager.notify(1, builder.build());
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), new Intent(context, HoldFragmentsActivity.class), PendingIntent.FLAG_IMMUTABLE);
+        builder.setFullScreenIntent(pendingIntent, true);
+
+        builder.setCategory(NotificationCompat.CATEGORY_CALL); //To prevent the notification from disappearing after a few seconds
+
+
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
 
     }
 
-    private String getCurrentHourAndMinute(){
-        int hour = LocalDateTime.now().getHour();
-        int minute = LocalDateTime.now().getMinute();
-        return String.format("%02d:%02d", hour, minute);
+    private void playSound(int soundId, Context context){
+       MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build());
+
+        try {
+            //Set mediaPlayer sound
+            mediaPlayer.setDataSource(context, Uri.parse("android.resource://com.example.wakeup/" + soundId));
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
     }
+
 
 }
