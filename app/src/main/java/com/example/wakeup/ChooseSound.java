@@ -100,7 +100,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
          */
 
         Intent intentFromCreateAlarm = getIntent();
-        String text = intentFromCreateAlarm.getStringExtra("soundName");
+        String text = intentFromCreateAlarm.getStringExtra("soundName_fromCreateAlarm");
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
              clickedRadioButton = (RadioButton) radioGroup.getChildAt(i);
             if (clickedRadioButton.getText().toString().equals(text)) {
@@ -112,8 +112,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
     }
 
-    private int getSoundID(String soundId) {
-        switch (soundId) {
+    public static int getSoundID(String soundName) {
+        switch (soundName) {
             case "Door knock":
                 return R.raw.door_knock;
             case "Heaven":
@@ -242,8 +242,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         } else {
             //Save button was clicked.
             Intent goToCreateAlarm = new Intent(this, CreateAlarm.class);
-            goToCreateAlarm.putExtra("resultText", clickedRadioButton.getText());
-            goToCreateAlarm.putExtra("resultId", getSoundID(clickedRadioButton.getText().toString()));
+            goToCreateAlarm.putExtra("soundName_fromChooseSound", clickedRadioButton.getText());
+            goToCreateAlarm.putExtra("volume_fromChooseSound", soundSlider.getValue() / (100 / maxAlarmStreamVolume));
 
             setResult(1, goToCreateAlarm);
             super.onBackPressed();
@@ -282,6 +282,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         mediaPlayer.release();
         super.onDestroy();
     }
+
 
     public void onBackIconChooseSound(View view) {
         super.onBackPressed();

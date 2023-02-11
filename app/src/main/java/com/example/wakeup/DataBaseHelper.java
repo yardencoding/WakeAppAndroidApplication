@@ -92,7 +92,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<Alarm> getAllAlarmsFromDataBase(){
+    public  ArrayList<Alarm> getAllAlarmsFromDataBase(){
         ArrayList<Alarm> returnList = new ArrayList<>();
         String getAlarmsCommand = "SELECT * FROM " + ALARM_TABLE;
         SQLiteDatabase database = this.getReadableDatabase();

@@ -1,5 +1,6 @@
 package com.example.wakeup;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 
@@ -11,11 +12,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 
-public class OnPopAlarm extends Fragment {
+public class OnPopAlarm extends Fragment implements View.OnClickListener{
 
     private ConstraintLayout constraintLayout;
+    private Button stopAlarmServiceBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,6 +31,9 @@ public class OnPopAlarm extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         constraintLayout = view.findViewById(R.id.cancelAlarmFragment);
+        stopAlarmServiceBtn = view.findViewById(R.id.stop_alarm_Service_btn);
+        stopAlarmServiceBtn.setOnClickListener(this);
+
 
         //Start background animation
         AnimationDrawable animationDrawable = (AnimationDrawable) constraintLayout.getBackground();
@@ -37,4 +43,9 @@ public class OnPopAlarm extends Fragment {
     }
 
 
+    @Override
+    public void onClick(View v) {
+        //Stop alarm service
+        getActivity().stopService(new Intent(getContext(), AlarmService.class));
+    }
 }

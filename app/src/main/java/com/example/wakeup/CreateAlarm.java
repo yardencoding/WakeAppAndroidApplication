@@ -19,10 +19,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Switch;
@@ -55,11 +57,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
 
     //To store the sound name in SharedPreferences
-    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String SHARED_PREFS = "CHOOSE_SOUND_SHARED_PREF";
     private static final String SOUND_NAME = "SOUND_NAME";
 
-    private  int soundId;
-
+    private  int volume,maxVolume;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,26 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             alarmSoundName.setText(loadDataFromSharedPreferences());
         }
 
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+
+
+        //If useContacts is checked and there are no contacts added, then go to the Contact activity to add
+        useMyContactsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+          @Override
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                  SharedPreferences preferences = getSharedPreferences(Contact.SHARED_PREFS, MODE_PRIVATE);
+                  String contact1 = preferences.getString(Contact.PHONE_NUMBER_1, "");
+                 String contact2 = preferences.getString(Contact.PHONE_NUMBER_2, "");
+                 String contact3 = preferences.getString(Contact.PHONE_NUMBER_3, "");
+                 if(isChecked)
+                 if(contact1.isEmpty() && contact2.isEmpty() && contact3.isEmpty()) {
+                     Toast.makeText(CreateAlarm.this, "על מנת להשתמש באופציה הזאת יש להוסיף אנשי קשר", Toast.LENGTH_SHORT).show();
+                     startActivity(new Intent(CreateAlarm.this, Contact.class));
+                 }
+
+          }
+      });
     }
 
 
@@ -149,8 +170,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                             Intent intent = result.getData();
                             if (intent != null) {
                                 //Extract data from ChooseSound activity
-                                String soundName = intent.getStringExtra("resultText");
-                                 soundId = intent.getIntExtra("resultId", 0); //Will be used when creating alarm.
+                                String soundName = intent.getStringExtra("soundName_fromChooseSound");
+                                  volume = intent.getIntExtra("volume_fromChooseSound", 60 / (100 / maxVolume));
                                 alarmSoundName.setText(soundName);
                             }
                         }
@@ -167,7 +188,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 break;
             case R.id.alarm_sound_btn:
                 Intent goToChooseSound = new Intent(this, ChooseSound.class);
-                goToChooseSound.putExtra("soundName", alarmSoundName.getText().toString());
+                goToChooseSound.putExtra("soundName_fromCreateAlarm", alarmSoundName.getText().toString());
                 activityResultLauncher.launch(goToChooseSound);
                 break;
 
@@ -219,7 +240,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             saveSoundName();
 
             // schedule the alarm
-            scheduleAlarm(newAlarm);
+            newAlarm.setVolume(volume);
+            newAlarm.schedule(this);
 
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
@@ -321,26 +343,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return sharedPreferences.getString(SOUND_NAME, defaultStringValue);
     }
 
-    public void scheduleAlarm(Alarm alarm){
-
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra("runningAlarm", alarm);
-        intent.putExtra("soundId", soundId);
-
-
-        long milliseconds = alarm.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int)milliseconds, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        if(alarm.isRecurring() == false)
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milliseconds, pendingIntent);
-        /*
-        else
-        handle recurring alarms
-         */
-
-    }
 
     public void onBackIconCreateAlarm(View view) {
         super.onBackPressed();

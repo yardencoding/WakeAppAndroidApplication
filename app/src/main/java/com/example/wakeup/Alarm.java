@@ -1,10 +1,14 @@
 package com.example.wakeup;
 
 import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
@@ -27,6 +31,8 @@ public class Alarm implements Parcelable {
     private boolean active;
     private boolean sunday, monday, tuesday, wednesday, thursday, friday, saturday;
     private boolean hasSound, hasVibrate, hasMission,hasUseMyContacts;
+
+    private int volume;
 
 
     // initialize alarm with id, name, mission, hour, minute and which days it will run
@@ -99,6 +105,14 @@ public class Alarm implements Parcelable {
 
     public boolean isActive() {
         return active;
+    }
+
+    public int getVolume() {
+        return volume;
+    }
+
+    public void setVolume(int volume) {
+        this.volume = volume;
     }
 
     public boolean isSunday() {
@@ -308,6 +322,9 @@ public class Alarm implements Parcelable {
     }
 
     public boolean alreadyExist(ArrayList<Alarm> alarmArrayList) {
+        if(alarmArrayList.size() <= 1) //Because the alarm will always be equal to itself
+            return false;
+
         for (int i = 0; i < alarmArrayList.size(); i++)
             if (alarmArrayList.get(i).equals(this))
                 return true;
@@ -404,6 +421,17 @@ public class Alarm implements Parcelable {
             }
         }
         return firstActive;
+    }
+
+     public void schedule(Context context){
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("alarmToBroadcastReceiver", this);
+        long milliseconds = this.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int)milliseconds, intent, PendingIntent.FLAG_IMMUTABLE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, milliseconds, pendingIntent);
+
     }
 
 

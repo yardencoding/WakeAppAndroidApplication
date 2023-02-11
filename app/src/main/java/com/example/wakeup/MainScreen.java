@@ -125,8 +125,8 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         Intent intent = new Intent(this, CreateAlarm.class);
         Alarm clickedAlarm = alarmList.get(position);
         intent.putExtra("getClickedAlarm", clickedAlarm);
-        //To check that I don't change alarm settings to an already existing alarm.
 
+        //To check that I don't change alarm settings to an already existing alarm.
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
 
         startActivity(intent);
