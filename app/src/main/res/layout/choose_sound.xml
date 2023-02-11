@@ -115,38 +115,25 @@
         android:id="@+id/play_audio_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
         android:background="@color/transparent"
         android:contentDescription="play audio"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_radioGroup"
-        app:srcCompat="@drawable/play" />
-
-    <ImageButton
-        android:id="@+id/pause_audio_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
-        android:background="@color/transparent"
-        android:contentDescription="pause audio"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sound_names_radioGroup"
-        app:srcCompat="@drawable/pause" />
+        app:srcCompat="@drawable/play" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/sound_slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="70dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:contentDescription="control volume"
         android:layoutDirection="rtl"
         android:valueFrom="0"
         android:valueTo="100"
-        app:layout_constraintBottom_toTopOf="@+id/save_sound_image_button"
         app:layout_constraintEnd_toEndOf="@+id/volume_image_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_audio_button" />
@@ -155,9 +142,8 @@
         android:id="@+id/volume_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
+        android:layout_marginBottom="35dp"
         android:background="@color/transparent"
         android:contentDescription="volume icon"
         android:minWidth="48dp"
@@ -165,19 +151,18 @@
         android:src="@drawable/audio"
         app:layout_constraintBottom_toTopOf="@+id/save_sound_image_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/sound_slider"
         app:layout_constraintTop_toBottomOf="@+id/play_audio_button" />
 
     <ImageButton
         android:id="@+id/save_sound_image_button"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="50dp"
         android:background="@android:color/transparent"
         android:contentDescription="save the alarm"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sound_slider"
         app:srcCompat="@drawable/checkmark" />
 
     <ImageButton

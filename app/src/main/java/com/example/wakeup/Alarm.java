@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,6 +34,7 @@ public class Alarm implements Parcelable {
     private boolean hasSound, hasVibrate, hasMission,hasUseMyContacts;
 
     private int volume;
+
 
 
     // initialize alarm with id, name, mission, hour, minute and which days it will run
@@ -429,14 +431,21 @@ public class Alarm implements Parcelable {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("alarmToBroadcastReceiver", this);
         long milliseconds = this.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int)milliseconds, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id , intent, PendingIntent.FLAG_IMMUTABLE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, milliseconds, pendingIntent);
 
     }
 
+    public void cancel(Context context){
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id , intent, PendingIntent.FLAG_IMMUTABLE);
+        alarmManager.cancel(pendingIntent);
+
+    }
 
 
-    // Returns true if the two alarms has the same Hour, Minute and Days.
+    // Returns true if  two alarms has the same Hour, Minute and Days.
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
@@ -447,7 +456,7 @@ public class Alarm implements Parcelable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(hour, minute, sunday, monday, tuesday, wednesday, thursday, friday, saturday);
+       return Objects.hash(hour, minute, sunday, monday, tuesday, wednesday, thursday, friday, saturday);
     }
 
 
@@ -520,7 +529,6 @@ public class Alarm implements Parcelable {
         String s1 = "התראה לשעה";
 
         if (!isRecurring()) { // If alarm has one day
-            LocalDateTime alarmDay = LocalDateTime.now();
             int dayInMonth = getAlarmLocalDateTime().getDayOfMonth();
 
 

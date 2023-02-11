@@ -30,7 +30,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
          TextView alarm_time;
          TextView alarm_mission;
          TextView sunday, monday, tuesday, wednesday, thursday, friday, saturday;
-         Switch alarm_switch;
+          Switch alarm_switch;
          ConstraintLayout cardViewLayout;
 
 
@@ -117,10 +117,12 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                         holder.cardViewLayout.setBackgroundResource(R.color.inactiveAlarm);
                         DataBaseHelper.database.changeAlarmActiveState(false, alarm);
                         alarm.setActive(false);
+                        alarm.cancel(holder.itemView.getContext());
                     } else {
                         holder.cardViewLayout.setBackgroundResource(R.color.recyclerViewItemColor);
                         DataBaseHelper.database.changeAlarmActiveState(true, alarm);
                         alarm.setActive(true);
+                        alarm.schedule(holder.itemView.getContext());
                     }
 
                 }

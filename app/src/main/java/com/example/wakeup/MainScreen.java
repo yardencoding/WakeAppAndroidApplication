@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     private AlarmAdapter adapter;
     private Thread updateAlarmTime_thread;
     private Button addAlarmButton;
+
 
 
     @Override
@@ -85,6 +87,9 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                         @Override
                         public void run() {
                             changeFirstMessageToAlarmTime();
+                            for(Alarm alarm : alarmList)
+                                if(!alarm.isActive())
+                                    findViewById(R.id.alarm_switch).setActivated(false);
                         }
                     });
 
@@ -106,16 +111,21 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         Alarm deletedAlarm = alarmList.get(position);
 
+        //Cancel AlarmManger
+        deletedAlarm.cancel(MainScreen.this);
+
         // Remove alarm from database
         DataBaseHelper.database.deleteAlarm(deletedAlarm);
 
         // Remove alarm from list
         alarmList.remove(deletedAlarm);
 
+
         // Update adapter
         adapter.notifyItemRemoved(position);
 
         Toast.makeText(this, deletedAlarm.toString() + " נמחקה", Toast.LENGTH_SHORT).show();
+
 
     }
 

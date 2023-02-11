@@ -127,7 +127,6 @@
                 app:layout_constraintBottom_toBottomOf="@+id/alarm_vibrate_btn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/alarm_vibrate_btn"
-                android:checked="true"
                 />
 
             <TextView

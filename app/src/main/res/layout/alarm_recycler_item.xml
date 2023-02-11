@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="10dp"
                 android:text="בוקר טוב!"
                 android:textSize="@dimen/recycler_item_name_textSize"
                 app:layout_constraintBottom_toBottomOf="parent"

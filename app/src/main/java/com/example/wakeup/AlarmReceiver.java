@@ -5,9 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
 public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
@@ -30,9 +27,13 @@ public class AlarmReceiver extends BroadcastReceiver {
             if(alarm.isRecurring()) {
                 alarm.schedule(context);
             }
-
             context.startForegroundService(StartIntentIntent);
         }
+
+    }
+
+    private void disableAlarm(){
+        //make the alarm inactive after it pops
 
     }
 
