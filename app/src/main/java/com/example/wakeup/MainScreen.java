@@ -25,8 +25,8 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     private RecyclerView recyclerView;
     private TextView firstMessage;
-    private ArrayList<Alarm> alarmList;
-    private AlarmAdapter adapter;
+    public static ArrayList<Alarm> alarmList;
+    public static AlarmAdapter adapter;
     private Thread updateAlarmTime_thread;
     private Button addAlarmButton;
 
@@ -87,9 +87,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                         @Override
                         public void run() {
                             changeFirstMessageToAlarmTime();
-                            for(Alarm alarm : alarmList)
-                                if(!alarm.isActive())
-                                    findViewById(R.id.alarm_switch).setActivated(false);
+
                         }
                     });
 

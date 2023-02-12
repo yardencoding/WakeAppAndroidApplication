@@ -29,6 +29,19 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarm.schedule(context);
             }
 
+            //make alarm inactive when it pops
+
+            int firingAlarmIndex = MainScreen.alarmList.indexOf(alarm);
+
+            //change alarm active state to false, from alarmList because the recyclerView loads from alarmList.
+            MainScreen.alarmList.get(firingAlarmIndex).setActive(false);
+
+            //update alarm active state in sqlite database
+            DataBaseHelper.database.changeAlarmActiveState(false, alarm);
+
+            //update alarm adapter so that it call onBindViewHolder()
+            MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
+
             context.startForegroundService(StartIntentIntent);
         }
 
