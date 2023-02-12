@@ -25,7 +25,7 @@ import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
-public class CreateAlarm extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class CreateAlarm extends AppCompatActivity implements View.OnClickListener {
 
 
     private Button timeButton;
@@ -85,7 +85,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         vibrateSwitch = findViewById(R.id.alarm_vibrate_switch);
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
-
 
          chooseSoundPreferences = getSharedPreferences(ChooseSound.SHARED_PREFS, MODE_PRIVATE);
         //Sound name.
@@ -151,7 +150,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     private void createAlarm() {
 
-        if (postNotificationWasGranted() && timeWasChosen()) {
+        if (postNotificationWasGranted() && timeWasChosen() && makeSureThatContactsWereAdded()) {
 
             //Create Alarm fields
             String name = alarmName.getText().toString();
@@ -183,12 +182,19 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
 
+
+            int newAlarmId;
+
             // schedule the alarm
-            if (getClickedAlarm() != null) //If we want to update this alarm, delete the previous one.
+            if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
                 getClickedAlarm().cancel(this);
+                newAlarmId = alarmList_FromIntent.size();
+            } else{
+                newAlarmId = alarmList_FromIntent.size() + 1;
+            }
 
             newAlarm.setVolume(chooseSoundPreferences.getInt(ChooseSound.SOUND_VOLUME, 60) / (100 / maxVolume));
-            newAlarm.setId(alarmList_FromIntent.size() + 1);
+            newAlarm.setId(newAlarmId);
             newAlarm.schedule(this);
 
 
@@ -197,6 +203,22 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             startActivity(goToMainScreen);
 
         }
+    }
+
+    //If the "useMyContacts" switch is checked make  sure that contacts were added.
+    private boolean makeSureThatContactsWereAdded() {
+        if(useMyContactsSwitch.isChecked()) {
+            SharedPreferences preferences = getSharedPreferences(Contact.SHARED_PREFS, MODE_PRIVATE);
+            String contact1 = preferences.getString(Contact.PHONE_NUMBER_1, "");
+            String contact2 = preferences.getString(Contact.PHONE_NUMBER_2, "");
+            String contact3 = preferences.getString(Contact.PHONE_NUMBER_3, "");
+            if (contact1.isEmpty() && contact2.isEmpty() && contact3.isEmpty()) {
+                Toast.makeText(this, "לא הוספת אנשי קשר", Toast.LENGTH_SHORT).show();
+                return false;
+            } else
+                return true;
+        }
+        return true;
     }
 
     private boolean timeWasChosen() {
@@ -279,26 +301,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     public void onBackIconCreateAlarm(View view) {
         super.onBackPressed();
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-        //If useContacts is checked and there are no contacts added, then go to the Contact activity to add
-        if (buttonView.getId() == useMyContactsSwitch.getId()) {
-            SharedPreferences preferences = getSharedPreferences(Contact.SHARED_PREFS, MODE_PRIVATE);
-            String contact1 = preferences.getString(Contact.PHONE_NUMBER_1, "");
-            String contact2 = preferences.getString(Contact.PHONE_NUMBER_2, "");
-            String contact3 = preferences.getString(Contact.PHONE_NUMBER_3, "");
-            if (isChecked)
-                if (contact1.isEmpty() && contact2.isEmpty() && contact3.isEmpty()) {
-                    Toast.makeText(CreateAlarm.this, "על מנת להשתמש באופציה הזאת יש להוסיף אנשי קשר", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(CreateAlarm.this, Contact.class));
-                }
-
-        } else if(buttonView.getId() == missionSwitch.getId()){
-            //Choose mission is pressed
-        }
     }
 
 

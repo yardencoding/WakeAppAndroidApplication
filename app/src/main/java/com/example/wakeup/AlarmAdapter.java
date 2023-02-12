@@ -128,7 +128,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 }
             });
 
-
         }
 
         private void markSunday(AlarmViewHolder holder) {

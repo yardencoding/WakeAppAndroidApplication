@@ -7,6 +7,7 @@ import android.content.Intent;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
+    private  Alarm alarm;
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -19,7 +20,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         } else{
 
             //Start Alarm service
-            Alarm alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
+             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
             Intent StartIntentIntent = new Intent(context, AlarmService.class);
             StartIntentIntent.putExtra("alarmToService", alarm);
 
@@ -27,13 +28,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             if(alarm.isRecurring()) {
                 alarm.schedule(context);
             }
+
             context.startForegroundService(StartIntentIntent);
         }
-
-    }
-
-    private void disableAlarm(){
-        //make the alarm inactive after it pops
 
     }
 

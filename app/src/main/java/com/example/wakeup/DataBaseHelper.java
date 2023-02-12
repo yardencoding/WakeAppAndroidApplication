@@ -161,6 +161,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ALARM_ACTIVE, newState);
         database.update(ALARM_TABLE,contentValues, COLUMN_ALARM_ID + " = " + String.valueOf(alarm.getId()), null);
+
         database.close();
     }
 
