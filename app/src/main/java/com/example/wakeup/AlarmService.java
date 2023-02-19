@@ -1,13 +1,10 @@
 package com.example.wakeup;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -19,12 +16,9 @@ import android.os.Vibrator;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class AlarmService extends Service {
 
-    private static final String CHANNEL_ID = "alarmNotificationId";
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
 
@@ -48,14 +42,6 @@ public class AlarmService extends Service {
 
         alarm = intent.getParcelableExtra("alarmToService");
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //Notification channel, needed for sdk 26 and above
-        NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Alarm ring", NotificationManager.IMPORTANCE_HIGH);
-        notificationChannel.enableLights(true);
-        notificationChannel.setLightColor(Color.GREEN);
-        notificationChannel.enableVibration(true);
-        notificationManager.createNotificationChannel(notificationChannel);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 (int) System.currentTimeMillis(),
@@ -63,10 +49,10 @@ public class AlarmService extends Service {
                 PendingIntent.FLAG_IMMUTABLE);
 
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
                 .setContentText(alarm.getName())
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setFullScreenIntent(pendingIntent,true)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setAutoCancel(true)

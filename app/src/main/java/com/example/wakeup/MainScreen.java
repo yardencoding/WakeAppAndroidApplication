@@ -7,9 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,12 +33,15 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     private Thread updateAlarmTime_thread;
     private Button addAlarmButton;
 
+    public static final String ALARM_RING_CHANNEL_ID = "alarmRingNotification_Id";
+    public static final String STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID = "statusBarAndReschedule_Id";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+
 
 
         //Add alarm button
@@ -66,11 +72,14 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         Alarm.sortAlarms(alarmList);
         adapter.notifyDataSetChanged();
 
-
         updateFirstMessage_thread();
+
+        createAlarmRingNotificationChannel();
+        createAlarmStatusBarAndReschedule_NotificationChannel();
 
         //Request showing notification permission.
         requestNotificationPermission();
+
     }
 
 
@@ -124,7 +133,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         Toast.makeText(this, deletedAlarm.toString() + " נמחקה", Toast.LENGTH_SHORT).show();
 
-
     }
 
     @Override
@@ -141,10 +149,15 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     }
 
     private void changeFirstMessageToAlarmTime() {
+
+        Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
+
         Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
         if (alarm != null) {
             firstMessage.setText(alarm.getHowMuchTimeTillAlarm());
+            startForegroundService(statusBarService);
         } else {
+            stopService(statusBarService);
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
             if (alarmList.isEmpty() == false)
                 firstMessage.setText("כל ההתראות כבויות");
@@ -174,6 +187,22 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                 PackageManager.PERMISSION_DENIED
         )
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
-        }
+      }
+
+
+    //Notification channel, needed for sdk 26 and above
+    private void createAlarmRingNotificationChannel(){
+          NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+          NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_HIGH);
+          notificationManager.createNotificationChannel(notificationChannel);
+      }
+
+      private void createAlarmStatusBarAndReschedule_NotificationChannel(){
+          NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+          NotificationChannel notificationChannel = new NotificationChannel(STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID, "התראות קרובות", NotificationManager.IMPORTANCE_MIN);
+          notificationManager.createNotificationChannel(notificationChannel);
+      }
     }
+
+
 

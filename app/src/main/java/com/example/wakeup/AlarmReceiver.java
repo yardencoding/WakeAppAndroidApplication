@@ -7,26 +7,26 @@ import android.content.Intent;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    private  Alarm alarm;
+    private Alarm alarm;
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //When the device shuts down all the alarms scheduled by AlarmManger will be lost, so we need to reschedule them
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            //Intent RescheduleIntentService= new Intent(context, RescheduleAlarmsService.class);
-            //context.startForegroundService(RescheduleIntentService);
-
-
-        } else{
-
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            Intent statusBarIntent = new Intent(context, StatusBarNotificationService.class) ;
+            context.startForegroundService(statusBarIntent);
+    } else{
             //Start Alarm service
-             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
-            Intent StartIntentIntent = new Intent(context, AlarmService.class);
-            StartIntentIntent.putExtra("alarmToService", alarm);
+            alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
+            Intent startAlarmService = new Intent(context, AlarmService.class);
+            startAlarmService.putExtra("alarmToService", alarm);
 
             //If the alarm is recurring schedule the next day.
-            if(alarm.isRecurring()) {
+            if (alarm.isRecurring()) {
                 alarm.schedule(context);
+            } else {
+                //stop the StatusBarNotification service if the alarm is not recurring because there are no more alarms.
+                context.stopService(new Intent(context, StatusBarNotificationService.class));
             }
 
             //make alarm inactive when it pops
@@ -42,10 +42,8 @@ public class AlarmReceiver extends BroadcastReceiver {
             //update alarm adapter so that it call onBindViewHolder()
             MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
 
-            context.startForegroundService(StartIntentIntent);
+            context.startForegroundService(startAlarmService);
         }
-
     }
-
 
 }

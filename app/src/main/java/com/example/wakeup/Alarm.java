@@ -432,8 +432,8 @@ public class Alarm implements Parcelable {
         intent.putExtra("alarmToBroadcastReceiver", this);
         long milliseconds = this.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id , intent, PendingIntent.FLAG_IMMUTABLE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, milliseconds, pendingIntent);
-
+        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(milliseconds, pendingIntent);
+        alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
     }
 
     public void cancel(Context context){

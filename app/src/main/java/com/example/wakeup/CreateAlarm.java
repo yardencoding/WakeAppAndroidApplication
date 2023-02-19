@@ -152,6 +152,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         if (postNotificationWasGranted() && timeWasChosen() && makeSureThatContactsWereAdded()) {
 
+            // Start the statusBarService that will show a consistent icon as long as there are active alarms.
+            Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
+            startForegroundService(statusBarService);
+
+
             //Create Alarm fields
             String name = alarmName.getText().toString();
             String mission = alarmMissionName.getText().toString();
@@ -183,9 +188,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
 
 
+            //set the id of the new alarm the AlarmList.
             int newAlarmId;
-
-            // schedule the alarm
             if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
                 getClickedAlarm().cancel(this);
                 newAlarmId = alarmList_FromIntent.size();
@@ -193,9 +197,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 newAlarmId = alarmList_FromIntent.size() + 1;
             }
 
+            // schedule the alarm
             newAlarm.setVolume(chooseSoundPreferences.getInt(ChooseSound.SOUND_VOLUME, 60) / (100 / maxVolume));
             newAlarm.setId(newAlarmId);
             newAlarm.schedule(this);
+
 
 
             // go to the first activity
