@@ -42,8 +42,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-
-
         //Add alarm button
         addAlarmButton = findViewById(R.id.add_btn);
         addAlarmButton.setOnClickListener(this);

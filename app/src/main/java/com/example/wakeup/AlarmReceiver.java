@@ -1,9 +1,13 @@
 package com.example.wakeup;
 
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.core.app.NotificationCompat;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -12,9 +16,25 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Intent statusBarIntent = new Intent(context, StatusBarNotificationService.class) ;
-            context.startForegroundService(statusBarIntent);
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            //reschedule alarms. Because AlarmManger loses all of his alarms after reboot
+            for (Alarm alarm: DataBaseHelper.database.getAllAlarmsFromDataBase())
+                if(alarm.isActive())
+                    alarm.schedule(context);
+
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(context,
+                    (int) System.currentTimeMillis(),
+                    new Intent(context, MainScreen.class),
+                    PendingIntent.FLAG_IMMUTABLE);
+
+            Notification notification = new NotificationCompat.Builder(context, MainScreen.STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.notification_icon)
+                    .setCategory(NotificationCompat.CATEGORY_STATUS)
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true)
+                    .build();
+
     } else{
             //Start Alarm service
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
@@ -26,7 +46,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarm.schedule(context);
             } else {
                 //stop the StatusBarNotification service if the alarm is not recurring because there are no more alarms.
-                context.stopService(new Intent(context, StatusBarNotificationService.class));
+              //  context.stopService(new Intent(context, StatusBarNotificationService.class));
             }
 
             //make alarm inactive when it pops

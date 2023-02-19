@@ -43,9 +43,12 @@ public class AlarmService extends Service {
         alarm = intent.getParcelableExtra("alarmToService");
 
 
+        Intent startHoldFragmentsActivity = new Intent(this, HoldFragmentsActivity.class);
+        startHoldFragmentsActivity.putExtra("alarmNameFromService", alarm.getName());
+        startHoldFragmentsActivity.putExtra("hasMissionFromService", alarm.hasMission());
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 (int) System.currentTimeMillis(),
-                new Intent(this, HoldFragmentsActivity.class),
+                startHoldFragmentsActivity ,
                 PendingIntent.FLAG_IMMUTABLE);
 
 
