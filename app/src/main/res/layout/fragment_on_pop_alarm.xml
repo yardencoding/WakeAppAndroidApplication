@@ -27,8 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="בוקר טוב!"
-        android:textSize="40sp"
         android:textColor="#AAFF00"
+        android:textSize="35sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,7 +37,7 @@
         android:id="@+id/show_time_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
+        android:textSize="40sp"
         app:layout_constraintBottom_toTopOf="@+id/stop_alarm_Service_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

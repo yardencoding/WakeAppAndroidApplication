@@ -2,6 +2,7 @@ package com.example.wakeup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -97,6 +98,21 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         if(getClickedAlarm() != null)
             alarmWasClicked();
 
+
+        //To request camera permission when the hasMission switch is checked
+        missionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    if (ContextCompat.checkSelfPermission(CreateAlarm.this,
+                            Manifest.permission.CAMERA) ==
+                            PackageManager.PERMISSION_DENIED) {
+                        ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, 45);
+                    }
+                }
+            }
+        });
+
 }
 
 
@@ -150,7 +166,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     private void createAlarm() {
 
-        if (postNotificationWasGranted() && timeWasChosen() && makeSureThatContactsWereAdded()) {
+        if (postNotificationWasGranted() && timeWasChosen() && makeSureThatContactsWereAdded() && makeSureThatCameraPermissionWasGranted()) {
 
             // Start the statusBarService that will show a consistent icon as long as there are active alarms.
             Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
@@ -223,6 +239,16 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 return false;
             } else
                 return true;
+        }
+        return true;
+    }
+
+    private boolean makeSureThatCameraPermissionWasGranted(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להפעיל משימה", Toast.LENGTH_LONG).show();
+            return false;
         }
         return true;
     }

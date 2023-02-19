@@ -22,19 +22,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if(alarm.isActive())
                     alarm.schedule(context);
 
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(context,
-                    (int) System.currentTimeMillis(),
-                    new Intent(context, MainScreen.class),
-                    PendingIntent.FLAG_IMMUTABLE);
-
-            Notification notification = new NotificationCompat.Builder(context, MainScreen.STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.notification_icon)
-                    .setCategory(NotificationCompat.CATEGORY_STATUS)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .build();
-
     } else{
             //Start Alarm service
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");

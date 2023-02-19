@@ -42,8 +42,10 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
         stopAlarmServiceBtn.setOnClickListener(this);
         String name = getActivity().getIntent().getStringExtra("alarmNameFromService");
         hasMission = getActivity().getIntent().getBooleanExtra("hasMissionFromService", false);
+
         if(!name.isEmpty())
-        cancel_alarm_textView.setText(name);
+            cancel_alarm_textView.setText(name);
+
         updateTimeConsistently();
    }
 
@@ -87,9 +89,12 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         //Stop alarm service
         getActivity().stopService(new Intent(getContext(), AlarmService.class));
-
         //Go to checkSmile fragment
         if (hasMission){
+
+
+        } else{
+            getActivity().finish();
         }
     }
 }
