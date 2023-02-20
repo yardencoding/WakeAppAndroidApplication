@@ -8,14 +8,14 @@
         android:id="@+id/onPopAlarm"
         android:name="com.example.wakeup.OnPopAlarm"
         android:label="fragment_on_pop_alarm"
-        tools:layout="@layout/fragment_on_pop_alarm" />
+        tools:layout="@layout/fragment_on_pop_alarm" >
+        <action
+            android:id="@+id/action_onPopAlarm_to_checkSmile"
+            app:destination="@id/checkSmile" />
+    </fragment>
     <fragment
         android:id="@+id/checkSmile"
         android:name="com.example.wakeup.CheckSmile"
         android:label="fragment_check_smile"
-        tools:layout="@layout/fragment_check_smile" >
-        <action
-            android:id="@+id/action_checkSmile_to_onPopAlarm"
-            app:destination="@id/onPopAlarm" />
-    </fragment>
+        tools:layout="@layout/fragment_check_smile" />
 </navigation>

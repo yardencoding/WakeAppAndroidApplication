@@ -20,12 +20,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
+
+import java.util.Calendar;
+import java.util.List;
 
 public class CheckSmile extends Fragment implements View.OnClickListener{
 
     private Button open_camera_button;
     private ImageView user_photo_imageView;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+
+    private Bitmap bitmap;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,8 +67,9 @@ public class CheckSmile extends Fragment implements View.OnClickListener{
 
                         if(result.getResultCode() == RESULT_OK && result.getData() != null){
                             Bundle bundle = result.getData().getExtras();
-                            Bitmap bitmap = (Bitmap) bundle.get("data");
+                             bitmap = (Bitmap) bundle.get("data");
                             user_photo_imageView.setImageBitmap(bitmap);
+                            detectSmile();
                         }
                     }
                 });
@@ -63,5 +80,53 @@ public class CheckSmile extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         Intent cameraApp = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         activityResultLauncher.launch(cameraApp);
+    }
+
+    private void detectSmile(){
+        //This is using firebase ml kit api.
+
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+
+        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
+                .getVisionFaceDetector();
+
+        FirebaseVisionFaceDetectorOptions options =
+                new FirebaseVisionFaceDetectorOptions.Builder()
+                        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                        .setLandmarkMode(FirebaseVisionFaceDetectorOptions.NO_LANDMARKS)
+                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                        .build();
+
+        detector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(options);
+
+        detector.detectInImage(image)
+                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
+                    @Override
+                    public void onSuccess(List<FirebaseVisionFace> faces) {
+                        for (FirebaseVisionFace face : faces) {
+                            float smileProbability = face.getSmilingProbability();
+                            if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                                if (smileProbability > 0.5) {
+                                    // Detected a smile
+                                    Toast.makeText(requireContext(), "Smile detected!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    // Did not detect a smile
+                                    Toast.makeText(requireContext(), "No smile detected.", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                // Smile probability was not computed
+                                Toast.makeText(requireContext(), "Smile probability not computed.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Handle error
+                    }
+                });
+
     }
 }
