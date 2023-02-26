@@ -32,7 +32,7 @@ public class StatusBarNotificationService extends Service {
                 new Intent(this, MainScreen.class),
                 PendingIntent.FLAG_IMMUTABLE);
 
-        Notification notification = new NotificationCompat.Builder(this, MainScreen.STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setContentIntent(pendingIntent)

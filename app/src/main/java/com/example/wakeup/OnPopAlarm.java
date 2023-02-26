@@ -1,5 +1,7 @@
 package com.example.wakeup;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -19,14 +21,18 @@ import android.widget.TextView;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public class OnPopAlarm extends Fragment implements View.OnClickListener{
 
     private Button stopAlarmServiceBtn;
     private TextView cancel_alarm_textView, show_time_tv;
-    private Thread showTimeThread;
-    private boolean hasMission;
+
+    private Handler timeHandler;
+
+
+    private Alarm poppedAlarm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,60 +48,73 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
         cancel_alarm_textView = view.findViewById(R.id.cancel_alarm_textView);
         show_time_tv = view.findViewById(R.id.show_time_tv);
         stopAlarmServiceBtn.setOnClickListener(this);
-        String name = getActivity().getIntent().getStringExtra("alarmNameFromService");
-        hasMission = getActivity().getIntent().getBooleanExtra("hasMissionFromService", false);
+
+        poppedAlarm = getActivity().getIntent().getParcelableExtra("alarmToPopScreen");
+
+       String name = poppedAlarm.getName();
 
         if(!name.isEmpty())
             cancel_alarm_textView.setText(name);
 
-        updateTimeConsistently();
+        if(poppedAlarm.hasMission())
+           cancel_alarm_textView.setText("התחל משימה");
+
+        timeHandler = new Handler();
+
+        //start alarm service.
+        Intent startAlarmService = new Intent(requireContext(), AlarmService.class);
+        startAlarmService.putExtra("alarmToServiceFromPoppedScreen", poppedAlarm);
+        getActivity().startForegroundService(startAlarmService);
+
+
    }
 
-    public void updateTimeConsistently() {
-        showTimeThread = new Thread() {
-            public void run() {
-                while (Thread.currentThread().isInterrupted() == false) {
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            show_time_tv.setText(getCurrentTime());
-                        }
-                    });
 
-                    try {
-                        Thread.sleep(60_000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+   private Runnable updateTimeTask = new Runnable() {
+       @Override
+       public void run() {
+           show_time_tv.setText(getCurrentTime());
+           // schedule the task to run again after 1 minute
+           timeHandler.postDelayed(this, 60_000);
+       }
+   };
 
-                }
-            }
-        };
-        showTimeThread.start();
-    }
 
-   private String getCurrentTime(){
+    private String getCurrentTime(){
         int hour = LocalDateTime.now().getHour();
         int minute = LocalDateTime.now().getMinute();
         return String.format("%02d:%02d", hour, minute);
    }
 
+
     @Override
-    public void onDestroy() {
-        showTimeThread.interrupt();
-        super.onDestroy();
+    public void onStart() {
+        super.onStart();
+        timeHandler.post(updateTimeTask);
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        timeHandler.removeCallbacks(updateTimeTask);
+
+    }
+
 
     @Override
     public void onClick(View view) {
         //Stop alarm service
         getActivity().stopService(new Intent(getContext(), AlarmService.class));
         //Go to checkSmile fragment
-        if (hasMission){
+        if (poppedAlarm.hasMission()){
             Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
         } else{
-            getActivity().finish();
+            getActivity().finishAndRemoveTask();
+
         }
     }
+
+
+
 }

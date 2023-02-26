@@ -2,6 +2,8 @@ package com.example.wakeup;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -35,13 +37,16 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import java.util.Calendar;
 import java.util.List;
 
-public class CheckSmile extends Fragment implements View.OnClickListener{
+public class CheckSmile extends Fragment implements View.OnClickListener, OnSuccessListener<List<FirebaseVisionFace>>, OnFailureListener{
 
     private Button open_camera_button;
     private ImageView user_photo_imageView;
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     private Bitmap bitmap;
+
+    //the minimum probability for detecting smile & open eyes.
+    private final float MINIMUM_PROBABILITY = 0.5f;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -83,50 +88,58 @@ public class CheckSmile extends Fragment implements View.OnClickListener{
     }
 
     private void detectSmile(){
-        //This is using firebase ml kit api.
+        //This is using Firebase ml kit api.
 
-        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+        FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap);
 
-        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector();
-
-        FirebaseVisionFaceDetectorOptions options =
-                new FirebaseVisionFaceDetectorOptions.Builder()
+        //Initialize the FaceDetectorOptions.
+        FirebaseVisionFaceDetectorOptions faceDetectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
                         .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                        .setLandmarkMode(FirebaseVisionFaceDetectorOptions.NO_LANDMARKS)
                         .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                         .build();
 
-        detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(options);
+        //Initialize the face FaceDetector. so that we will be able to use the "detectInImage" function & onSuccess Interface to process the faces.
+        FirebaseVisionFaceDetector faceDetector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(faceDetectorOptions);
 
-        detector.detectInImage(image)
-                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
-                    @Override
-                    public void onSuccess(List<FirebaseVisionFace> faces) {
-                        for (FirebaseVisionFace face : faces) {
-                            float smileProbability = face.getSmilingProbability();
-                            if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
-                                if (smileProbability > 0.5) {
-                                    // Detected a smile
-                                    Toast.makeText(requireContext(), "Smile detected!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    // Did not detect a smile
-                                    Toast.makeText(requireContext(), "No smile detected.", Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                // Smile probability was not computed
-                                Toast.makeText(requireContext(), "Smile probability not computed.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Handle error
-                    }
-                });
+        faceDetector.detectInImage(firebaseVisionImage).addOnSuccessListener(this).addOnFailureListener(this);
 
+    }
+
+    //It is used to iterate all the faces in the current image
+    @Override
+    public void onSuccess(List<FirebaseVisionFace> faces) {
+
+        //Because I only need to detect one face.
+        if(faces.size() == 1) {
+
+            FirebaseVisionFace face = faces.get(0);
+
+            float smileProbability = face.getSmilingProbability();
+            if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY)
+                if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY
+                        && smileProbability > MINIMUM_PROBABILITY) {
+
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    //Exit the app
+                    getActivity().finishAndRemoveTask();
+
+                } else {
+                    Toast.makeText(requireContext(), "לא זוהה חיוך בבקשה נסה שוב", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
+    @Override
+    public void onFailure(@NonNull Exception e) {
+        //If we are not able to detect the image.
+
+        //Might happen when the Image is too small or too large, the image quality is too low etc.
+        Toast.makeText(requireContext(), "לא הצלחנו לזהות את התמונה שלך. בבקשה צלם שוב.", Toast.LENGTH_LONG).show();
     }
 }

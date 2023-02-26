@@ -40,28 +40,12 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        alarm = intent.getParcelableExtra("alarmToService");
-
-
-        Intent startHoldFragmentsActivity = new Intent(this, HoldFragmentsActivity.class);
-        startHoldFragmentsActivity.putExtra("alarmNameFromService", alarm.getName());
-        startHoldFragmentsActivity.putExtra("hasMissionFromService", alarm.hasMission());
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                (int) System.currentTimeMillis(),
-                startHoldFragmentsActivity ,
-                PendingIntent.FLAG_IMMUTABLE);
-
+        alarm = intent.getParcelableExtra("alarmToServiceFromPoppedScreen");
 
         Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
-                .setContentText(alarm.getName())
                 .setSmallIcon(R.drawable.notification_icon)
-                .setFullScreenIntent(pendingIntent,true)
-                .setCategory(NotificationCompat.CATEGORY_CALL)
-                .setAutoCancel(true)
-                .setOngoing(true)
                 .build();
-
 
         //Play sound
         if(alarm.hasSound()) {

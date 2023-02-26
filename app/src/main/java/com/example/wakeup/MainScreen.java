@@ -1,5 +1,9 @@
 package com.example.wakeup;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -13,8 +17,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +40,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     private Button addAlarmButton;
 
     public static final String ALARM_RING_CHANNEL_ID = "alarmRingNotification_Id";
-    public static final String STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID = "statusBarAndReschedule_Id";
 
 
     @Override
@@ -72,11 +77,11 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         updateFirstMessage_thread();
 
-        createAlarmRingNotificationChannel();
-        createAlarmStatusBarAndReschedule_NotificationChannel();
+        createNotificationChannel();
 
         //Request showing notification permission.
         requestNotificationPermission();
+
 
     }
 
@@ -189,18 +194,26 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
 
     //Notification channel, needed for sdk 26 and above
-    private void createAlarmRingNotificationChannel(){
+    private void createNotificationChannel(){
           NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-          NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_HIGH);
+          NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_MIN);
           notificationManager.createNotificationChannel(notificationChannel);
       }
 
-      private void createAlarmStatusBarAndReschedule_NotificationChannel(){
-          NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-          NotificationChannel notificationChannel = new NotificationChannel(STATUS_BAR_AND_RESCHEDULE_CHANNEL_ID, "התראות קרובות", NotificationManager.IMPORTANCE_MIN);
-          notificationManager.createNotificationChannel(notificationChannel);
-      }
-    }
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == RESULT_OK) {
+                Toast.makeText(MainScreen.this, "כעת האפליקציה תוכל להציג התראות מעל אפליקציות אחרות", Toast.LENGTH_SHORT).show();
+            } else{
+               Toast.makeText(MainScreen.this, "האפליקציה לא תוכל להציג התראות מעל אפליקציות אחרות", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+
+
+
+}
 
 
 

@@ -1,13 +1,10 @@
 package com.example.wakeup;
 
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.core.app.NotificationCompat;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -25,15 +22,18 @@ public class AlarmReceiver extends BroadcastReceiver {
     } else{
             //Start Alarm service
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
-            Intent startAlarmService = new Intent(context, AlarmService.class);
-            startAlarmService.putExtra("alarmToService", alarm);
+           // Intent startAlarmService = new Intent(context, AlarmService.class);
+            Intent openOnPopAlarm = new Intent(context, HoldFragmentsActivity.class);
+            openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
+
 
             //If the alarm is recurring schedule the next day.
             if (alarm.isRecurring()) {
                 alarm.schedule(context);
             } else {
                 //stop the StatusBarNotification service if the alarm is not recurring because there are no more alarms.
-              //  context.stopService(new Intent(context, StatusBarNotificationService.class));
+               context.stopService(new Intent(context, StatusBarNotificationService.class));
             }
 
             //make alarm inactive when it pops
@@ -49,7 +49,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             //update alarm adapter so that it call onBindViewHolder()
             MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
 
-            context.startForegroundService(startAlarmService);
+            context.startActivity(openOnPopAlarm);
         }
     }
 

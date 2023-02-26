@@ -1,17 +1,25 @@
 package com.example.wakeup;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +31,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -48,7 +58,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private ArrayList<Alarm> alarmList_FromIntent;
 
     //To get the sound name and volume from ChooseSound Activity.
-    private  SharedPreferences chooseSoundPreferences;
+    private SharedPreferences chooseSoundPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +97,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         missionSwitch = findViewById(R.id.alarm_mission_switch);
         useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
 
-         chooseSoundPreferences = getSharedPreferences(ChooseSound.SHARED_PREFS, MODE_PRIVATE);
+        chooseSoundPreferences = getSharedPreferences(ChooseSound.SHARED_PREFS, MODE_PRIVATE);
         //Sound name.
         alarmSoundName.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
 
@@ -95,7 +105,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
 
         //If we opened this activity through an alarm click. change the fields to match alarm fields.
-        if(getClickedAlarm() != null)
+        if (getClickedAlarm() != null)
             alarmWasClicked();
 
 
@@ -103,7 +113,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         missionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     if (ContextCompat.checkSelfPermission(CreateAlarm.this,
                             Manifest.permission.CAMERA) ==
                             PackageManager.PERMISSION_DENIED) {
@@ -113,7 +123,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             }
         });
 
-}
+    }
 
 
     // crates a timePicker dialog when "בחר שעה" btn is clicked
@@ -166,7 +176,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     private void createAlarm() {
 
-        if (postNotificationWasGranted() && timeWasChosen() && makeSureThatContactsWereAdded() && makeSureThatCameraPermissionWasGranted()) {
+        if (postNotificationWasGranted()
+                && timeWasChosen()
+                && makeSureThatContactsWereAdded()
+                && makeSureThatCameraPermissionWasGranted()
+                && hasDisplayOverOtherAppsPermission()) {
 
             // Start the statusBarService that will show a consistent icon as long as there are active alarms.
             Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
@@ -203,13 +217,12 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
 
-
             //set the id of the new alarm the AlarmList.
             int newAlarmId;
             if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
                 getClickedAlarm().cancel(this);
                 newAlarmId = alarmList_FromIntent.size();
-            } else{
+            } else {
                 newAlarmId = alarmList_FromIntent.size() + 1;
             }
 
@@ -219,7 +232,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             newAlarm.schedule(this);
 
 
-
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
             startActivity(goToMainScreen);
@@ -227,9 +239,30 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+    private boolean hasDisplayOverOtherAppsPermission() {
+        if (!Settings.canDrawOverlays(this)) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("אפשר הרשאה של הצג מעל אפליקציות אחרות");
+            builder.setPositiveButton("לך להגדרות", (dialog, which) -> {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                activityResultLauncher.launch(intent);
+            });
+            builder.setNegativeButton("סגור", (dialog, which) -> {
+                Toast.makeText(CreateAlarm.this, "בלי הרשאה זו, לא תוכל ליצור התראה.", Toast.LENGTH_SHORT).show();
+                dialog.cancel();
+            });
+
+            builder.show();
+
+            return false;
+        }
+        return true;
+    }
+
     //If the "useMyContacts" switch is checked make  sure that contacts were added.
     private boolean makeSureThatContactsWereAdded() {
-        if(useMyContactsSwitch.isChecked()) {
+        if (useMyContactsSwitch.isChecked()) {
             SharedPreferences preferences = getSharedPreferences(Contact.SHARED_PREFS, MODE_PRIVATE);
             String contact1 = preferences.getString(Contact.PHONE_NUMBER_1, "");
             String contact2 = preferences.getString(Contact.PHONE_NUMBER_2, "");
@@ -243,13 +276,14 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return true;
     }
 
-    private boolean makeSureThatCameraPermissionWasGranted(){
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להפעיל משימה", Toast.LENGTH_LONG).show();
-            return false;
-        }
+    private boolean makeSureThatCameraPermissionWasGranted() {
+        if (missionSwitch.isChecked())
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להפעיל צילום חיוך", Toast.LENGTH_LONG).show();
+                return false;
+            }
         return true;
     }
 
@@ -323,11 +357,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
             }
             // Toast message with the remaining time until the alarm
-            Toast.makeText(CreateAlarm.this, newAlarm.getHowMuchTimeTillAlarm(), Toast.LENGTH_LONG).show();
+            Toast.makeText(CreateAlarm.this, newAlarm.getHowMuchTimeTillAlarm(), Toast.LENGTH_SHORT).show();
 
         } else {
             //Toast message that says alarm already exist
-            Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_LONG).show();
+            Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -336,6 +370,12 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     }
 
 
+    //Needed in order to launch the MANAGE_OVERLAY_PERMISSION screen. and to handle the result.
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (!Settings.canDrawOverlays(CreateAlarm.this)) {
+            Toast.makeText(CreateAlarm.this, "בלי הרשאה זו, לא תוכל ליצור התראה.", Toast.LENGTH_SHORT).show();
+        }
+    });
 
     //When I come back from ChooseSound or Contacts
     @Override
