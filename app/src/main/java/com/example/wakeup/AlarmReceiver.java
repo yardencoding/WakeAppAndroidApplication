@@ -19,12 +19,13 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if(alarm.isActive())
                     alarm.schedule(context);
 
+
     } else{
             //Start Alarm service
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
            // Intent startAlarmService = new Intent(context, AlarmService.class);
             Intent openOnPopAlarm = new Intent(context, HoldFragmentsActivity.class);
-            openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            openOnPopAlarm.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK);
             openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
 
 

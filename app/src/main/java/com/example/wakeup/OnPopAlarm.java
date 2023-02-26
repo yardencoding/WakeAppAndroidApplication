@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -98,18 +99,18 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
     public void onStop() {
         super.onStop();
         timeHandler.removeCallbacks(updateTimeTask);
-
     }
 
 
     @Override
     public void onClick(View view) {
-        //Stop alarm service
-        getActivity().stopService(new Intent(getContext(), AlarmService.class));
         //Go to checkSmile fragment
         if (poppedAlarm.hasMission()){
             Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
+
         } else{
+            //Stop alarm service
+            getActivity().stopService(new Intent(getContext(), AlarmService.class));
             getActivity().finishAndRemoveTask();
 
         }

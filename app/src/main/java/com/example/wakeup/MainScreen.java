@@ -41,6 +41,12 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     public static final String ALARM_RING_CHANNEL_ID = "alarmRingNotification_Id";
 
+    public static final int POST_NOTIFICATION_REQUEST_CODE = 2;
+    public static final int SEND_SMS_REQUEST_CODE = 3;
+
+    public static final int CAMERA_REQUEST_CODE = 4;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +195,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                 Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_DENIED
         )
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_REQUEST_CODE);
       }
 
 

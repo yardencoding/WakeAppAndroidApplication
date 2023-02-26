@@ -25,7 +25,6 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     private static EditText phoneNumber3;
     private static EditText textMessage;
     private ImageButton saveContactsImageButton;
-    private int SEND_SMS_REQUEST_CODE = 1;
 
     //To store the phones and message in SharedPreferences(file in our device)
     public static final String SHARED_PREFS = "CONTACT_SHARED_PREF";
@@ -107,7 +106,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void requestSendSmsPermission() {
-        ActivityCompat.requestPermissions(Contact.this, new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
+        ActivityCompat.requestPermissions(Contact.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
     }
 
     @Override

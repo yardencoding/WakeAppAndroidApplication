@@ -117,7 +117,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     if (ContextCompat.checkSelfPermission(CreateAlarm.this,
                             Manifest.permission.CAMERA) ==
                             PackageManager.PERMISSION_DENIED) {
-                        ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, 45);
+                        ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
                     }
                 }
             }

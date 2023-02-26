@@ -20,6 +20,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -120,13 +121,11 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
                 if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY
                         && smileProbability > MINIMUM_PROBABILITY) {
 
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    //Stop alarm service
+                    getActivity().stopService(new Intent(getContext(), AlarmService.class));
 
-                    //Exit the app
+
+                    //Exit the app. We have to clear those flags first.
                     getActivity().finishAndRemoveTask();
 
                 } else {
