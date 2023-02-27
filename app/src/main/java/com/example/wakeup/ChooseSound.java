@@ -46,10 +46,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
 
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

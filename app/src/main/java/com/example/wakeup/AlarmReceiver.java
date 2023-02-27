@@ -25,7 +25,10 @@ public class AlarmReceiver extends BroadcastReceiver {
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
            // Intent startAlarmService = new Intent(context, AlarmService.class);
             Intent openOnPopAlarm = new Intent(context, HoldFragmentsActivity.class);
+            //To create a new stack and remove all the previous activities from the stack.
             openOnPopAlarm.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK);
+            openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
             openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
 
 

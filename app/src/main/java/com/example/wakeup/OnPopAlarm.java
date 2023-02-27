@@ -113,6 +113,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
             getActivity().finishAndRemoveTask();
 
+
         }
     }
 

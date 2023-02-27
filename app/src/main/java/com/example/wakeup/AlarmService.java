@@ -42,9 +42,15 @@ public class AlarmService extends Service {
 
         alarm = intent.getParcelableExtra("alarmToServiceFromPoppedScreen");
 
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                (int) System.currentTimeMillis(),
+                new Intent(this, MainScreen.class),
+                PendingIntent.FLAG_IMMUTABLE);
+
         Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
                 .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(pendingIntent)
                 .build();
 
         //Play sound

@@ -36,7 +36,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-public class CreateAlarm extends AppCompatActivity implements View.OnClickListener {
+public class CreateAlarm extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
 
     private Button timeButton;
@@ -110,19 +110,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
 
         //To request camera permission when the hasMission switch is checked
-        missionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (ContextCompat.checkSelfPermission(CreateAlarm.this,
-                            Manifest.permission.CAMERA) ==
-                            PackageManager.PERMISSION_DENIED) {
-                        ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
-                    }
-                }
-            }
-        });
-
+        missionSwitch.setOnCheckedChangeListener(this);
+        useMyContactsSwitch.setOnCheckedChangeListener(this);
     }
 
 
@@ -165,7 +154,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 break;
 
             case R.id.alarm_contacts_btn:
+                if(hasSendSmsPermission())
                 startActivity(new Intent(CreateAlarm.this, Contact.class));
+                Toast.makeText(CreateAlarm.this,"יש לאשר את הרשאת שליחת SMS", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.save_alarm_ImageButton:
@@ -385,5 +376,28 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         alarmSoundName.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
 
     }
-}
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            if(buttonView.getId() == missionSwitch.getId()) {
+                if (ContextCompat.checkSelfPermission(CreateAlarm.this,
+                        Manifest.permission.CAMERA) ==
+                        PackageManager.PERMISSION_DENIED) {
+                    ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
+                }
+            } else if(buttonView.getId() == useContactsButton.getId()){
+                if(hasSendSmsPermission())
+                    ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
+                }
+            }
+        }
+
+    private boolean hasSendSmsPermission(){
+        if (ContextCompat.checkSelfPermission(CreateAlarm.this,
+                Manifest.permission.SEND_SMS) ==
+                PackageManager.PERMISSION_DENIED)
+            return false;
+        return true;
+    }
+}

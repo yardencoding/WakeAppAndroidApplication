@@ -52,10 +52,6 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
         saveContactsImageButton = findViewById(R.id.save_contactsImageButton);
         saveContactsImageButton.setOnClickListener(this);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_DENIED) {
-            requestSendSmsPermission();
-        }
-
         //Retrieve the message and numbers from shared preference
         loadDataFromSharedPref();
         textMessage.setText(loadedMessage);
@@ -103,10 +99,6 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
                         null);
             }
 
-    }
-
-    private void requestSendSmsPermission() {
-        ActivityCompat.requestPermissions(Contact.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
     }
 
     @Override
