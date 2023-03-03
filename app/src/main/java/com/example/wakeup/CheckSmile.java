@@ -104,7 +104,6 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
                 .getVisionFaceDetector(faceDetectorOptions);
 
         faceDetector.detectInImage(firebaseVisionImage).addOnSuccessListener(this).addOnFailureListener(this);
-
     }
 
     //It is used to iterate all the faces in the current image

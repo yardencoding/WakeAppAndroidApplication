@@ -184,10 +184,16 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     @Override
     public void onClick(View v) {
+        /*
         //When add button is clicked
         Intent intent = new Intent(this, CreateAlarm.class);
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
         startActivity(intent);
+         */
+
+        //untill I will finish the maze game
+        startActivity(new Intent(this, HoldFragmentsActivity.class));
+
     }
 
     private void requestNotificationPermission() {

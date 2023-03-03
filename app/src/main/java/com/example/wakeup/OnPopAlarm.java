@@ -106,7 +106,8 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         //Go to checkSmile fragment
         if (poppedAlarm.hasMission()){
-            Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
+            //Until I finish the maze game
+          //  Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
 
         } else{
             //Stop alarm service
