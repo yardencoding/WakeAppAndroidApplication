@@ -156,6 +156,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             case R.id.alarm_contacts_btn:
                 if(hasSendSmsPermission())
                 startActivity(new Intent(CreateAlarm.this, Contact.class));
+                else
                 Toast.makeText(CreateAlarm.this,"יש לאשר את הרשאת שליחת SMS", Toast.LENGTH_SHORT).show();
                 break;
 

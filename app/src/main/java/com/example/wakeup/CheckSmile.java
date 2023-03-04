@@ -114,7 +114,6 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
         if(faces.size() == 1) {
 
             FirebaseVisionFace face = faces.get(0);
-
             float smileProbability = face.getSmilingProbability();
             if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY)
                 if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY
