@@ -9,13 +9,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -25,102 +20,96 @@ import java.util.Stack;
 
 public class MazeView extends View {
 
-
-    private static final int ROWS = 14;
-    private static final int COLUMNS = 10;
+    private static final int ROWS = 8;
+    private static final int COLUMNS = 8;
 
     private static final int WALL_THICKNESS = 3;
 
-    private float cellSize, horizontalMargin, verticalMargin;
+    private float horizontalMargin, verticalMargin;
+
+    private int cellSize;
     private Cell[][] cells;
     private Paint paint, playerPaint;
 
     private Random random;
 
     private Cell player, exist;
+    private Bitmap flag_maze;
 
-    private Bitmap  exist_icon;
+    private RectF oval;
 
-    private static final int UP = 1;
-    private static final int DOWN = 2;
-    private static final int RIGHT = 3;
-    private static final int LEFT = 4;
+    private Rect existLocationRect, existSizeRect, playerRect_forInvalidate;
 
-    private SurfaceHolder surfaceHolder;
+    private float playerMargin;
 
 
-
-    public MazeView(Context context) {
-        super(context);
-
+    public MazeView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
         paint = new Paint();
         paint.setColor(Color.YELLOW);
         paint.setStrokeWidth(WALL_THICKNESS);
 
         playerPaint = new Paint();
-        playerPaint.setColor(Color.RED);
-
-        playerPaint = new Paint();
         playerPaint.setColor(Color.GREEN);
 
         random = new Random();
-        exist_icon = BitmapFactory.decodeResource(getResources(), R.drawable.flag_maze);
+        flag_maze = BitmapFactory.decodeResource(getResources(), R.drawable.flag_maze);
+
+        oval = new RectF();
+        existLocationRect = new Rect();
+        existSizeRect = new Rect();
+        playerRect_forInvalidate = new Rect();
 
 
         createMaze();
-
-
     }
 
 
-    private void createMaze(){
+    private void createMaze() {
         cells = new Cell[ROWS][COLUMNS];
         for (int row = 0; row < ROWS; row++)
             for (int column = 0; column < COLUMNS; column++)
-                cells[row][column] = new Cell(row,column);
-
-        player = cells[0][0];
-        exist = cells[ROWS - 1][COLUMNS -1 ];
-
+                cells[row][column] = new Cell(row, column);
 
 
         Cell current, next;
         Stack<Cell> stack = new Stack<>();
-
         current = cells[0][0];
-        current.visited = true;
+        current.setVisited(true);
 
-        do{
+        player = cells[0][0];
+        exist = cells[ROWS - 1][COLUMNS - 1];
+
+        do {
             next = getNeighbour(current);
-            if(next != null){
+            if (next != null) {
                 removeWall(current, next);
                 stack.push(current);
                 current = next;
-                current.visited = true;
+                current.setVisited(true);
             } else
                 current = stack.pop();
 
-        }while(!stack.isEmpty());
-
+        } while (!stack.isEmpty());
 
     }
 
     private void removeWall(Cell current, Cell next) {
-        if(current.column == next.column && current.row == next.row + 1){
-            current.topWall = false;
-            next.bottomWall = false;
+        if (current.getColumn() == next.getColumn() && current.getRow() == next.getRow() + 1) {
+            current.setTopWall(false);
+            next.setBottomWall(false);
         }
-        if(current.column == next.column && current.row == next.row - 1){
-            current.bottomWall = false;
-            next.topWall = false;
+        if (current.getColumn() == next.getColumn() && current.getRow() == next.getRow() - 1) {
+            current.setBottomWall(false);
+            next.setTopWall(false);
         }
-        if(current.column == next.column + 1 && current.row == next.row){
-            current.leftWall = false;
-            next.rightWall = false;
+        if (current.getColumn() == next.getColumn() + 1 && current.getRow() == next.getRow()) {
+            current.setLeftWall(false);
+            next.setRightWall(false);
         }
-        if(current.column == next.column - 1 && current.row == next.row ){
-            current.rightWall = false;
-            next.leftWall = false;
+        if (current.getColumn() == next.getColumn() - 1 && current.getRow() == next.getRow()) {
+            current.setRightWall(false);
+            next.setLeftWall(false);
         }
     }
 
@@ -128,29 +117,30 @@ public class MazeView extends View {
         ArrayList<Cell> neighbours = new ArrayList<>();
 
         //left neighbor
-        if(cell.column > 0)
-        if(!cells[cell.row][cell.column - 1].visited)
-            neighbours.add(cells[cell.row][cell.column - 1]);
+        if (cell.getColumn() > 0)
+            if (!cells[cell.getRow()][cell.getColumn() - 1].isVisited())
+                neighbours.add(cells[cell.getRow()][(cell.getColumn() - 1)]);
 
         //right neighbor
-        if(cell.column < COLUMNS - 1)
-        if(!cells[cell.row][cell.column + 1].visited)
-            neighbours.add(cells[cell.row][cell.column + 1]);
+        if (cell.getColumn() < COLUMNS - 1)
+            if (!cells[cell.getRow()][cell.getColumn() + 1].isVisited())
+                neighbours.add(cells[cell.getRow()][(cell.getColumn() + 1)]);
 
         //top neighbor
-        if(cell.row > 0)
-        if(!cells[cell.row - 1][cell.column].visited)
-            neighbours.add(cells[cell.row - 1][cell.column]);
+        if (cell.getRow() > 0)
+            if (!cells[cell.getRow() - 1][cell.getColumn()].isVisited())
+                neighbours.add(cells[cell.getRow() - 1][cell.getColumn()]);
 
         //bottom neighbor
-        if(cell.row < ROWS - 1)
-        if(!cells[cell.row + 1][cell.column].visited)
-            neighbours.add(cells[cell.row + 1][cell.column]);
+        if (cell.getRow() < ROWS - 1)
+            if (!cells[(cell.getRow() + 1)][cell.getColumn()].isVisited())
+                neighbours.add(cells[cell.getRow() + 1][cell.getColumn()]);
 
 
-        if(!neighbours.isEmpty()) {
+        //to get a random neighbour
+        if (!neighbours.isEmpty()) {
             int index = random.nextInt(neighbours.size());
-           return  neighbours.get(index);
+            return neighbours.get(index);
         }
         return null;
     }
@@ -158,7 +148,6 @@ public class MazeView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
 
         int width = getWidth();
         int height = getHeight();
@@ -168,148 +157,88 @@ public class MazeView extends View {
         else
             cellSize = height / (ROWS + 1);
 
+        //calculate view horizontal margin
         horizontalMargin = (width - COLUMNS * cellSize) / 2;
+        //calculate view vertical margin
         verticalMargin = (height - ROWS * cellSize) / 2;
 
         canvas.translate(horizontalMargin, verticalMargin);
 
-        for (int row = 0; row < ROWS; row++) {
+        //draw lines, after we have called createMaze() and created a path.
+        for (int row = 0; row < ROWS; row++)
             for (int column = 0; column < COLUMNS; column++) {
-                if (cells[row][column].topWall)
+                if (cells[row][column].isTopWall())
                     canvas.drawLine(column * cellSize, row * cellSize, (column + 1) * cellSize, row * cellSize, paint);
 
-                if (cells[row][column].leftWall)
+                if (cells[row][column].isLeftWall())
                     canvas.drawLine(column * cellSize, row * cellSize, column * cellSize, (row + 1) * cellSize, paint);
 
-                if (cells[row][column].bottomWall)
+                if (cells[row][column].isBottomWall())
                     canvas.drawLine(column * cellSize, (row + 1) * cellSize, (column + 1) * cellSize, (row + 1) * cellSize, paint);
 
-                if (cells[row][column].rightWall)
+                if (cells[row][column].isRightWall())
                     canvas.drawLine((column + 1) * cellSize, row * cellSize, (column + 1) * cellSize, (row + 1) * cellSize, paint);
             }
-        }
-
-
-         float playerMargin = cellSize / 10;
 
         //draw player
-        RectF ovalPlayer = new RectF(
-                player.column*cellSize + playerMargin,
-                player.row * cellSize + playerMargin,
-                (player.column+1)*cellSize - playerMargin,
-                (player.row+1)*cellSize - playerMargin
-        );
-        canvas.drawOval(ovalPlayer, playerPaint);
-
+        playerMargin = cellSize / 10;
+        oval.set(player.getColumn() * cellSize + playerMargin,
+                player.getRow() * cellSize + playerMargin,
+                (player.getColumn() + 1) * cellSize - playerMargin,
+                (player.getRow() + 1) * cellSize - playerMargin);
+        canvas.drawOval(oval, playerPaint);
 
         //draw exist
-        Rect existLocationRect  = new Rect(
-                (int)(exist.column*cellSize),
-                (int)(exist.row * cellSize ),
-                (int)((exist.column+1)*cellSize),
-                (int)((exist.row+1)*cellSize ));
-        Rect existSizeRect = new Rect(0,0,(int)cellSize,(int)cellSize);
-        canvas.drawBitmap(exist_icon, existSizeRect, existLocationRect, null);
+        existLocationRect.set(
+                exist.getColumn() * cellSize,
+                exist.getRow() * cellSize,
+                (exist.getColumn() + 1) * cellSize,
+                (exist.getRow() + 1) * cellSize
+        );
+        existSizeRect.set(0, 0, (int) cellSize, (int) cellSize);
+        canvas.drawBitmap(flag_maze, existSizeRect, existLocationRect, null);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        if(event.getAction() == MotionEvent.ACTION_DOWN) return true;
-        if(event.getAction() == MotionEvent.ACTION_MOVE) {
-            float x = event.getX();
-            float y = event.getY();
-            float playerCenterX = (horizontalMargin + (player.column + 0.5f) * cellSize);
-            float playerCenterY = (verticalMargin + (player.row) * cellSize + 0.5f);
-
-            float differenceX = x - playerCenterX;
-            float differenceY = y - playerCenterY;
-
-            float absX = Math.abs(differenceX);
-            float absY = Math.abs(differenceY);
-
-            if (absX > cellSize   || absY > cellSize  ) {
-
-                if (absX > absY) {
-                    //move in x direction
-                    if (differenceX > 0) {
-                        //move to the right
-                        movePlayer(RIGHT);
-                    } else {
-                        //move to the left
-                        movePlayer(LEFT);
-                    }
-                } else {
-                    //move int y direction
-                    if (differenceY > 0) {
-                        //move down
-                        movePlayer(DOWN);
-                    } else {
-                        //move up
-                        movePlayer(UP);
-                    }
-
-                }
-
-            }
+        public void moveRight() {
+        if (!player.isRightWall()) {
+            player = cells[player.getRow()][player.getColumn() + 1];
+            updatePlayerPosition();
         }
-        return true;
     }
 
-
-
-    private class Cell{
-        boolean leftWall = true;
-        boolean rightWall = true;
-        boolean bottomWall = true;
-        boolean topWall = true;
-
-        boolean visited;
-
-        int row, column;
-        public Cell(int row, int column){
-            this.row = row;
-            this.column = column;
+    public void moveLeft() {
+        if (!player.isLeftWall()) {
+            player = cells[player.getRow()][player.getColumn() - 1];
+            updatePlayerPosition();
         }
-
     }
 
-
-    private void movePlayer(int direction){
-        switch(direction){
-            case UP:
-                if(player.topWall == false)
-                player = cells[player.row - 1][player.column];
-                break;
-
-            case DOWN:
-                if(player.bottomWall == false)
-                    player = cells[player.row + 1][player.column];
-                break;
-
-            case LEFT:
-                if(player.leftWall == false)
-                    player = cells[player.row ][player.column - 1];
-                break;
-
-            case RIGHT:
-                if(player.rightWall == false)
-                    player = cells[player.row ][player.column + 1];
-                break;
+    public void moveUp() {
+        if (!player.isTopWall()) {
+            player = cells[player.getRow() - 1][player.getColumn()];
+            updatePlayerPosition();
         }
+    }
 
-
-
-
-        if(hasReachExist()) {
-            Toast.makeText(getContext(), "You won", Toast.LENGTH_LONG).show();
-
+    public void moveDown() {
+        if (!player.isBottomWall()) {
+            player = cells[player.getRow() + 1][player.getColumn()];
+            updatePlayerPosition();
         }
-
     }
 
-    private boolean hasReachExist(){
-            return (player.row == exist.row && player.column == exist.column);
+    public boolean hasReachedExist() {
+        return (player.getColumn() == exist.getColumn() && player.getRow() == exist.getRow());
     }
 
+    private void updatePlayerPosition() {
+        //set that we only update the player position, and do not have to reDraw the entire view
+        playerRect_forInvalidate.set(
+                player.getColumn() * cellSize,
+                player.getRow() * cellSize,
+                (player.getColumn() + 1) * cellSize,
+                (player.getRow() + 1) * cellSize
+        );
+        invalidate(playerRect_forInvalidate);
+    }
 }
