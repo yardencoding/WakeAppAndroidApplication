@@ -21,15 +21,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
     } else{
-            //Start Alarm service
+            //Open onPopAlarm activity
             alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
-           // Intent startAlarmService = new Intent(context, AlarmService.class);
             Intent openOnPopAlarm = new Intent(context, HoldFragmentsActivity.class);
-            //To create a new stack and remove all the previous activities from the stack.
-            //commented this because I do not want to close the entire app, only the running activity.
-            //openOnPopAlarm.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK);
-            //openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
+            openOnPopAlarm.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK);
             openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
 
 
@@ -39,20 +34,22 @@ public class AlarmReceiver extends BroadcastReceiver {
             } else {
                 //stop the StatusBarNotification service if the alarm is not recurring because there are no more alarms.
                context.stopService(new Intent(context, StatusBarNotificationService.class));
+
+                //make alarm inactive when it pops. if the alarms isn't recurring.
+                int firingAlarmIndex = MainScreen.alarmList.indexOf(alarm);
+
+                //change alarm active state to false, from alarmList because the recyclerView loads from alarmList.
+                MainScreen.alarmList.get(firingAlarmIndex).setActive(false);
+
+                //update alarm active state in sqlite database
+                DataBaseHelper.database.changeAlarmActiveState(false, alarm);
+
+                //update alarm adapter so that it call onBindViewHolder()
+                MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
             }
 
-            //make alarm inactive when it pops
 
-            int firingAlarmIndex = MainScreen.alarmList.indexOf(alarm);
 
-            //change alarm active state to false, from alarmList because the recyclerView loads from alarmList.
-            MainScreen.alarmList.get(firingAlarmIndex).setActive(false);
-
-            //update alarm active state in sqlite database
-            DataBaseHelper.database.changeAlarmActiveState(false, alarm);
-
-            //update alarm adapter so that it call onBindViewHolder()
-            MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
 
             context.startActivity(openOnPopAlarm);
         }

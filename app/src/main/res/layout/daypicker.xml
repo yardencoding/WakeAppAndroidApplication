@@ -13,7 +13,7 @@
 
 
     <ToggleButton
-        android:id="@+id/sunday_tb"
+        android:id="@+id/sunday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="@drawable/days_tb_background"
@@ -24,7 +24,7 @@
         style="@style/toggleButtonStyle"/>
 
     <ToggleButton
-        android:id="@+id/monday_tb"
+        android:id="@+id/monday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="7dp"
@@ -36,7 +36,7 @@
         style="@style/toggleButtonStyle"/>
 
     <ToggleButton
-        android:id="@+id/tuesday_tb"
+        android:id="@+id/tuesday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="7dp"
@@ -49,7 +49,7 @@
 
 
     <ToggleButton
-        android:id="@+id/wednesday_tb"
+        android:id="@+id/wednesday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="7dp"
@@ -62,7 +62,7 @@
 
 
     <ToggleButton
-        android:id="@+id/thursday_tb"
+        android:id="@+id/thursday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="7dp"
@@ -75,7 +75,7 @@
 
 
     <ToggleButton
-        android:id="@+id/friday_tb"
+        android:id="@+id/friday_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="7dp"
@@ -89,7 +89,7 @@
 
 
     <ToggleButton
-        android:id="@+id/saturday_tb"
+        android:id="@+id/saturday_toggle_button"
         style="@style/toggleButtonStyle"
         android:layout_width="48dp"
         android:layout_height="48dp"

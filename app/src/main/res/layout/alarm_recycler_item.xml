@@ -21,7 +21,7 @@
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cardViewLayout"
+            android:id="@+id/card_view_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/recyclerViewItemColor"
@@ -29,7 +29,7 @@
             >
 
             <TextView
-                android:id="@+id/alarm_time_tv"
+                android:id="@+id/alarm_time_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="06:00"
@@ -56,26 +56,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/alarm_time_tv"
+                app:layout_constraintEnd_toStartOf="@+id/alarm_time_text_view"
                 app:layout_constraintHorizontal_bias="0.247"
                 app:layout_constraintStart_toEndOf="@+id/alarm_switch"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.504" />
 
             <TextView
-                android:id="@+id/alarm_mission_tv"
+                android:id="@+id/alarm_mission_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="17dp"
                 android:text="הליכה"
                 android:textSize="@dimen/recycler_item_mission_textSize"
-                app:layout_constraintBottom_toTopOf="@+id/alarm_time_tv"
+                app:layout_constraintBottom_toTopOf="@+id/alarm_time_text_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                  />
 
             <TextView
-                android:id="@+id/alarm_name_tv"
+                android:id="@+id/alarm_name_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -84,7 +84,7 @@
                 android:textSize="@dimen/recycler_item_name_textSize"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/alarm_time_tv"
+                app:layout_constraintTop_toBottomOf="@+id/alarm_time_text_view"
                 app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

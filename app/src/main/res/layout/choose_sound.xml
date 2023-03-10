@@ -22,7 +22,7 @@
 
 
     <RadioGroup
-        android:id="@+id/sound_names_radioGroup"
+        android:id="@+id/sound_names_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
@@ -120,7 +120,7 @@
         android:contentDescription="play audio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sound_names_radioGroup"
+        app:layout_constraintTop_toBottomOf="@+id/sound_names_radio_group"
         app:srcCompat="@drawable/play" />
 
     <com.google.android.material.slider.Slider

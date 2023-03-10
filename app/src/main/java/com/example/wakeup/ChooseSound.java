@@ -1,20 +1,17 @@
 package com.example.wakeup;
 
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,13 +20,12 @@ import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class ChooseSound extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageButton play, volume, saveSound;
+    private ImageButton playAudioButton, volumeImageButton, saveSoundImageButton;
     private Slider soundSlider;
-    private RadioGroup radioGroup;
+    private RadioGroup soundNamesRadioGroup;
 
     private RadioButton clickedRadioButton;
     private MediaPlayer mediaPlayer;
@@ -52,9 +48,9 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.choose_sound);
 
         //RadioGroup
-        radioGroup = findViewById(R.id.sound_names_radioGroup);
+        soundNamesRadioGroup = findViewById(R.id.sound_names_radio_group);
         //Get the id of the clicked radioButton
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        soundNamesRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                     clickedRadioButton = findViewById(checkedId);
@@ -64,13 +60,13 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
 
         //ImageButtons
-        play = findViewById(R.id.play_audio_button);
-        volume = findViewById(R.id.volume_image_button);
-        saveSound = findViewById(R.id.save_sound_image_button);
+        playAudioButton = findViewById(R.id.play_audio_button);
+        volumeImageButton = findViewById(R.id.volume_image_button);
+        saveSoundImageButton = findViewById(R.id.save_sound_image_button);
 
-        play.setOnClickListener(this);
-        volume.setOnClickListener(this);
-        saveSound.setOnClickListener(this);
+        playAudioButton.setOnClickListener(this);
+        volumeImageButton.setOnClickListener(this);
+        saveSoundImageButton.setOnClickListener(this);
 
 
         //Slider
@@ -103,8 +99,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         Searching through RadioGroup to find the RadioButton with the same sound name
         as CreateAlarm sound name and set him to checked.
          */
-        for (int i = 0; i < radioGroup.getChildCount(); i++) {
-             clickedRadioButton = (RadioButton) radioGroup.getChildAt(i);
+        for (int i = 0; i < soundNamesRadioGroup.getChildCount(); i++) {
+             clickedRadioButton = (RadioButton) soundNamesRadioGroup.getChildAt(i);
             if (clickedRadioButton.getText().toString().equals(currentSoundName)) {
                 clickedRadioButton.setChecked(true);
                 break;

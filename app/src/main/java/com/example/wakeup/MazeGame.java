@@ -1,7 +1,6 @@
 package com.example.wakeup;
 
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,13 +10,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MazeGame extends Fragment implements View.OnClickListener{
 
-    private ImageButton up_btn, down_btn, right_btn, left_btn;
+    private ImageButton moveUpButton, moveDownButton, moveRightButton, moveLeftButton;
     private MazeView mazeView;
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,37 +26,34 @@ public class MazeGame extends Fragment implements View.OnClickListener{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        mazeView = view.findViewById(R.id.mazeView);
+        mazeView = view.findViewById(R.id.maze_view);
 
-        up_btn = view.findViewById(R.id.up_btn);
-        down_btn = view.findViewById(R.id.down_btn);
-        right_btn = view.findViewById(R.id.right_btn);
-        left_btn = view.findViewById(R.id.left_btn);
+        moveUpButton = view.findViewById(R.id.move_up_button);
+        moveDownButton = view.findViewById(R.id.move_down_button);
+        moveRightButton = view.findViewById(R.id.move_right_button);
+        moveLeftButton = view.findViewById(R.id.move_left_button);
 
-        up_btn.setOnClickListener(this);
-        down_btn.setOnClickListener(this);
-        right_btn.setOnClickListener(this);
-        left_btn.setOnClickListener(this);
-
+        moveUpButton.setOnClickListener(this);
+        moveDownButton.setOnClickListener(this);
+        moveRightButton.setOnClickListener(this);
+        moveLeftButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View clickedButton) {
         switch (clickedButton.getId()){
-            case R.id.up_btn:
+            case R.id.move_up_button:
                 mazeView.moveUp();
                 break;
-            case R.id.down_btn:
+            case R.id.move_down_button:
                 mazeView.moveDown();
-
                 break;
 
-            case R.id.left_btn:
+            case R.id.move_left_button:
                 mazeView.moveLeft();
-
                 break;
 
-            case R.id.right_btn:
+            case R.id.move_right_button:
                 mazeView.moveRight();
                 break;
         }
@@ -68,13 +63,10 @@ public class MazeGame extends Fragment implements View.OnClickListener{
             //stop  alarm service.
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
 
-            Toast.makeText(getContext(), "כל הכבוד! פתרת את המבוך", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "כל הכבוד! פתרת את המבוך", Toast.LENGTH_SHORT).show();
             getActivity().finishAndRemoveTask();
 
-
         }
-
-
 
     }
 }

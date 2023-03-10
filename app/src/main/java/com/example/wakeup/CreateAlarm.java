@@ -1,7 +1,5 @@
 package com.example.wakeup;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,35 +19,35 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 public class CreateAlarm extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
 
-    private Button timeButton;
+    private Button chooseTimeButton;
     private int hour = 6, minute = 0;
-    private ToggleButton sunday, monday, tuesday, wednesday, thursday,
-            friday, saturday;
-    private EditText alarmName;
-    private TextView alarmMissionName, alarmSoundName;
+    private ToggleButton sundayToggleButton, mondayToggleButton, tuesdayToggleButton, wednesdayToggleButton, thursdayToggleButton,
+            fridayToggleButton, saturdayToggleButton;
+    private EditText alarmNameEditText;
+    private TextView alarmMissionNameTextView, alarmSoundNameTextView;
     ;
-    private ImageButton saveImageButton;
-    private Switch soundSwitch, vibrateSwitch, missionSwitch, useMyContactsSwitch;
-    private Button chooseSoundButton, missionButton, useContactsButton;
+    private ImageButton saveAlarmImageButton;
+    private Switch alarmSoundSwitch, alarmVibrateSwitch, alarmMissionSwitch, alarmContactsSwitch;
+    private Button alarmSoundButton, alarmMissionButton, alarmContactsButton;
 
     private boolean hasSelectedTime = false;
 
@@ -60,6 +59,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     //To get the sound name and volume from ChooseSound Activity.
     private SharedPreferences chooseSoundPreferences;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,39 +67,40 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_alarm);
 
 
-        timeButton = findViewById(R.id.choose_time_btn);
-        timeButton.setOnClickListener(this);
+        chooseTimeButton = findViewById(R.id.choose_time_button);
+        chooseTimeButton.setOnClickListener(this);
 
-        saveImageButton = findViewById(R.id.save_alarm_ImageButton);
-        saveImageButton.setOnClickListener(this);
+        saveAlarmImageButton = findViewById(R.id.save_alarm_image_button);
+        saveAlarmImageButton.setOnClickListener(this);
 
-        chooseSoundButton = findViewById(R.id.alarm_sound_btn);
-        chooseSoundButton.setOnClickListener(this);
+        alarmSoundButton = findViewById(R.id.alarm_sound_button);
+        alarmSoundButton.setOnClickListener(this);
 
-        missionButton = findViewById(R.id.alarm_mission_btn);
-        missionButton.setOnClickListener(this);
+        alarmMissionButton = findViewById(R.id.alarm_mission_button);
+        alarmMissionButton.setOnClickListener(this);
 
-        useContactsButton = findViewById(R.id.alarm_contacts_btn);
-        useContactsButton.setOnClickListener(this);
+        alarmContactsButton = findViewById(R.id.alarm_contacts_button);
+        alarmContactsButton.setOnClickListener(this);
 
-        sunday = findViewById(R.id.sunday_tb);
-        monday = findViewById(R.id.monday_tb);
-        tuesday = findViewById(R.id.tuesday_tb);
-        wednesday = findViewById(R.id.wednesday_tb);
-        thursday = findViewById(R.id.thursday_tb);
-        friday = findViewById(R.id.friday_tb);
-        saturday = findViewById(R.id.saturday_tb);
-        alarmName = findViewById(R.id.alarm_name_editText);
-        alarmMissionName = findViewById(R.id.mission_name_tv);
-        alarmSoundName = findViewById(R.id.song_name_tv);
-        soundSwitch = findViewById(R.id.alarm_sound_switch);
-        vibrateSwitch = findViewById(R.id.alarm_vibrate_switch);
-        missionSwitch = findViewById(R.id.alarm_mission_switch);
-        useMyContactsSwitch = findViewById(R.id.alarm_contacts_switch);
+
+        sundayToggleButton = findViewById(R.id.sunday_toggle_button);
+        mondayToggleButton = findViewById(R.id.monday_toggle_button);
+        tuesdayToggleButton = findViewById(R.id.tuesday_toggle_button);
+        wednesdayToggleButton = findViewById(R.id.wednesday_toggle_button);
+        thursdayToggleButton = findViewById(R.id.thursday_toggle_button);
+        fridayToggleButton = findViewById(R.id.friday_toggle_button);
+        saturdayToggleButton = findViewById(R.id.saturday_toggle_button);
+        alarmNameEditText = findViewById(R.id.alarm_name_edit_text);
+        alarmMissionNameTextView = findViewById(R.id.alarm_mission_name_text_view);
+        alarmSoundNameTextView = findViewById(R.id.alarm_sound_name_text_view);
+        alarmSoundSwitch = findViewById(R.id.alarm_sound_switch);
+        alarmVibrateSwitch = findViewById(R.id.alarm_vibrate_switch);
+        alarmMissionSwitch = findViewById(R.id.alarm_mission_switch);
+        alarmContactsSwitch = findViewById(R.id.alarm_contacts_switch);
+
 
         chooseSoundPreferences = getSharedPreferences(ChooseSound.SHARED_PREFS, MODE_PRIVATE);
-        //Sound name.
-        alarmSoundName.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
+        alarmSoundNameTextView.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
 
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
@@ -109,9 +110,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             alarmWasClicked();
 
 
-        //To request camera permission when the hasMission switch is checked
-        missionSwitch.setOnCheckedChangeListener(this);
-        useMyContactsSwitch.setOnCheckedChangeListener(this);
+        //To request SEND SMS permission when the contacts switch is checked.
+        alarmContactsSwitch.setOnCheckedChangeListener(this);
+        //If it is checked and I didn't chose a mission yet, open the mission dialog.
+        alarmMissionSwitch.setOnCheckedChangeListener(this);
     }
 
 
@@ -124,8 +126,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 hasSelectedTime = true;
                 hour = selectedHour;
                 minute = selectedMinute;
-                timeButton.setTextSize(35);
-                timeButton.setText(String.format("%02d:%02d", hour, minute));
+                chooseTimeButton.setTextSize(35);
+                chooseTimeButton.setText(String.format("%02d:%02d", hour, minute));
 
             }
         };
@@ -146,24 +148,61 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.choose_time_btn:
+            case R.id.choose_time_button:
                 popTimePicker();
                 break;
-            case R.id.alarm_sound_btn:
+            case R.id.alarm_sound_button:
                 startActivity(new Intent(CreateAlarm.this, ChooseSound.class));
                 break;
 
-            case R.id.alarm_contacts_btn:
-                if(hasSendSmsPermission())
-                startActivity(new Intent(CreateAlarm.this, Contact.class));
+            case R.id.alarm_contacts_button:
+                if (hasSendSmsPermission())
+                    startActivity(new Intent(CreateAlarm.this, Contact.class));
                 else
-                Toast.makeText(CreateAlarm.this,"יש לאשר את הרשאת שליחת SMS", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateAlarm.this, "יש לאשר את הרשאת שליחת SMS", Toast.LENGTH_SHORT).show();
                 break;
 
-            case R.id.save_alarm_ImageButton:
+            case R.id.alarm_mission_button:
+                showMissionDialog();
+                break;
+
+            case R.id.save_alarm_image_button:
                 createAlarm();
         }
 
+    }
+
+    private void showMissionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.mission_dialog, null);
+
+        builder.setView(dialogView)
+                .setPositiveButton("שמור", (dialog, which) -> {
+                    // Handle save button click
+                    RadioGroup radioGroup = dialogView.findViewById(R.id.mission_dialog_radio_group);
+                    int selectedId = radioGroup.getCheckedRadioButtonId();
+                    switch (selectedId) {
+                        case R.id.mission_dialog_smile_radio_button:
+                            requestCameraPermission();
+                            alarmMissionNameTextView.setText(" צילום חיוך");
+                            break;
+                        case R.id.mission_dialog_maze_radio_button:
+                            alarmMissionNameTextView.setText(" פתירת מבוך");
+                            break;
+                        case R.id.mission_dialog_wet_face_radio_button:
+                            requestCameraPermission();
+                            alarmMissionNameTextView.setText(" צילום פנים רטובות");
+                            break;
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton("בטל", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void createAlarm() {
@@ -171,7 +210,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         if (postNotificationWasGranted()
                 && timeWasChosen()
                 && makeSureThatContactsWereAdded()
-                && makeSureThatCameraPermissionWasGranted()
                 && hasDisplayOverOtherAppsPermission()) {
 
             // Start the statusBarService that will show a consistent icon as long as there are active alarms.
@@ -180,9 +218,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
 
             //Create Alarm fields
-            String name = alarmName.getText().toString();
-            String mission = alarmMissionName.getText().toString();
-            String soundName = alarmSoundName.getText().toString();
+            String name = alarmNameEditText.getText().toString();
+            String mission = alarmMissionNameTextView.getText().toString();
+            String soundName = alarmSoundNameTextView.getText().toString();
             Alarm newAlarm = new Alarm(
                     true,
                     hour,
@@ -190,17 +228,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     name,
                     mission,
                     soundName,
-                    sunday.isChecked(),
-                    monday.isChecked(),
-                    tuesday.isChecked(),
-                    wednesday.isChecked(),
-                    thursday.isChecked(),
-                    friday.isChecked(),
-                    saturday.isChecked(),
-                    soundSwitch.isChecked(),
-                    vibrateSwitch.isChecked(),
-                    missionSwitch.isChecked(),
-                    useMyContactsSwitch.isChecked()
+                    sundayToggleButton.isChecked(),
+                    mondayToggleButton.isChecked(),
+                    tuesdayToggleButton.isChecked(),
+                    wednesdayToggleButton.isChecked(),
+                    thursdayToggleButton.isChecked(),
+                    fridayToggleButton.isChecked(),
+                    saturdayToggleButton.isChecked(),
+                    alarmSoundSwitch.isChecked(),
+                    alarmVibrateSwitch.isChecked(),
+                    alarmMissionSwitch.isChecked(),
+                    alarmContactsSwitch.isChecked()
             );
 
             if (newAlarm.hasNoChosenDay())
@@ -254,7 +292,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     //If the "useMyContacts" switch is checked make  sure that contacts were added.
     private boolean makeSureThatContactsWereAdded() {
-        if (useMyContactsSwitch.isChecked()) {
+        if (alarmContactsSwitch.isChecked()) {
             SharedPreferences preferences = getSharedPreferences(Contact.SHARED_PREFS, MODE_PRIVATE);
             String contact1 = preferences.getString(Contact.PHONE_NUMBER_1, "");
             String contact2 = preferences.getString(Contact.PHONE_NUMBER_2, "");
@@ -265,17 +303,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             } else
                 return true;
         }
-        return true;
-    }
-
-    private boolean makeSureThatCameraPermissionWasGranted() {
-        if (missionSwitch.isChecked())
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להפעיל צילום חיוך", Toast.LENGTH_LONG).show();
-                return false;
-            }
         return true;
     }
 
@@ -313,21 +340,21 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
             hour = clickedAlarm.getHour();
             minute = clickedAlarm.getMinute();
-            timeButton.setText(String.format("%02d:%02d", hour, minute));
-            alarmName.setText(clickedAlarm.getName());
-            alarmMissionName.setText(clickedAlarm.getMission());
-            alarmSoundName.setText(clickedAlarm.getSoundName());
-            sunday.setChecked(clickedAlarm.isSunday());
-            monday.setChecked(clickedAlarm.isMonday());
-            tuesday.setChecked(clickedAlarm.isTuesday());
-            wednesday.setChecked(clickedAlarm.isWednesday());
-            thursday.setChecked(clickedAlarm.isThursday());
-            friday.setChecked(clickedAlarm.isFriday());
-            saturday.setChecked(clickedAlarm.isSaturday());
-            soundSwitch.setChecked(clickedAlarm.hasSound());
-            vibrateSwitch.setChecked(clickedAlarm.hasVibrate());
-            missionSwitch.setChecked(clickedAlarm.hasMission());
-            useMyContactsSwitch.setChecked(clickedAlarm.hasUseMyContacts());
+            chooseTimeButton.setText(String.format("%02d:%02d", hour, minute));
+            alarmNameEditText.setText(clickedAlarm.getName());
+            alarmMissionNameTextView.setText(clickedAlarm.getMission());
+            alarmSoundNameTextView.setText(clickedAlarm.getSoundName());
+            sundayToggleButton.setChecked(clickedAlarm.isSunday());
+            mondayToggleButton.setChecked(clickedAlarm.isMonday());
+            tuesdayToggleButton.setChecked(clickedAlarm.isTuesday());
+            wednesdayToggleButton.setChecked(clickedAlarm.isWednesday());
+            thursdayToggleButton.setChecked(clickedAlarm.isThursday());
+            fridayToggleButton.setChecked(clickedAlarm.isFriday());
+            saturdayToggleButton.setChecked(clickedAlarm.isSaturday());
+            alarmSoundSwitch.setChecked(clickedAlarm.hasSound());
+            alarmVibrateSwitch.setChecked(clickedAlarm.hasVibrate());
+            alarmMissionSwitch.setChecked(clickedAlarm.hasMission());
+            alarmContactsSwitch.setChecked(clickedAlarm.hasUseMyContacts());
 
         }
 
@@ -374,31 +401,52 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     protected void onResume() {
         super.onResume();
         //Change alarm sound name to the last chosen one. If there is no chosen song put "Homecoming"
-        alarmSoundName.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
+        alarmSoundNameTextView.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
 
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            if(buttonView.getId() == missionSwitch.getId()) {
-                if (ContextCompat.checkSelfPermission(CreateAlarm.this,
-                        Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_DENIED) {
-                    ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
-                }
-            } else if(buttonView.getId() == useContactsButton.getId()){
-                if(hasSendSmsPermission())
-                    ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
-                }
-            }
-        }
 
-    private boolean hasSendSmsPermission(){
-        if (ContextCompat.checkSelfPermission(CreateAlarm.this,
-                Manifest.permission.SEND_SMS) ==
-                PackageManager.PERMISSION_DENIED)
-            return false;
-        return true;
+            // If I the alarmMissionSwitch is checked and I didn't choose a mission yet, open the mission dialog.
+            if (buttonView.getId() == alarmMissionSwitch.getId())
+                if (alarmMissionNameTextView.getText().toString().isEmpty())
+                    showMissionDialog();
+
+                else if (buttonView.getId() == alarmContactsSwitch.getId())
+                    requestSendSmsPermission();
+        }
     }
+
+    private void requestCameraPermission() {
+        if (!hasCameraPermission()) {
+            Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להשתמש במשימה שבחרת", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
+        }
+    }
+
+    private boolean hasCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED)
+            return true;
+        return false;
+    }
+
+    private boolean hasSendSmsPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) ==
+                PackageManager.PERMISSION_GRANTED)
+            return true;
+        return false;
+    }
+
+    private void requestSendSmsPermission() {
+
+        if (!hasSendSmsPermission())
+            ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
+
+    }
+
 }

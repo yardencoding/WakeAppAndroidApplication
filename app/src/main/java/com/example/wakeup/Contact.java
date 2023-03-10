@@ -2,15 +2,12 @@ package com.example.wakeup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.View;
@@ -20,10 +17,10 @@ import android.widget.Toast;
 
 public class Contact extends AppCompatActivity implements View.OnClickListener {
 
-    private static EditText phoneNumber1;
-    private static EditText phoneNumber2;
-    private static EditText phoneNumber3;
-    private static EditText textMessage;
+    private static EditText phoneNumberOneEditText;
+    private static EditText phoneNumberTwoEditText;
+    private static EditText phoneNumberThreeEditText;
+    private static EditText textMessageEditText;
     private ImageButton saveContactsImageButton;
 
     //To store the phones and message in SharedPreferences(file in our device)
@@ -44,20 +41,20 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
         setContentView(R.layout.activity_contact);
 
         //Initialize EditTexts
-        phoneNumber1 = findViewById(R.id.editTextPhone1);
-        phoneNumber2 = findViewById(R.id.editTextPhone2);
-        phoneNumber3 = findViewById(R.id.editTextPhone3);
-        textMessage = findViewById(R.id.editTextMessage);
+        phoneNumberOneEditText = findViewById(R.id.phone_number_one_edit_text);
+        phoneNumberTwoEditText = findViewById(R.id.phone_number_two_edit_text);
+        phoneNumberThreeEditText = findViewById(R.id.phone_number_three_edit_text);
+        textMessageEditText = findViewById(R.id.text_message_edit_text);
 
-        saveContactsImageButton = findViewById(R.id.save_contactsImageButton);
+        saveContactsImageButton = findViewById(R.id.save_contacts_Image_button);
         saveContactsImageButton.setOnClickListener(this);
 
         //Retrieve the message and numbers from shared preference
         loadDataFromSharedPref();
-        textMessage.setText(loadedMessage);
-        phoneNumber1.setText(loadedPhoneNumber1);
-        phoneNumber2.setText(loadedPhoneNumber2);
-        phoneNumber3.setText(loadedPhoneNumber3);
+        textMessageEditText.setText(loadedMessage);
+        phoneNumberOneEditText.setText(loadedPhoneNumber1);
+        phoneNumberTwoEditText.setText(loadedPhoneNumber2);
+        phoneNumberThreeEditText.setText(loadedPhoneNumber3);
 
 
     }
@@ -65,14 +62,14 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
     public static void sendSms(Context context) {
 
-        String message = textMessage.getText().toString();
+        String message = textMessageEditText.getText().toString();
 
             SmsManager sms = SmsManager.getDefault();
 
             //Sends to the first number if isn't empty.
-            if (phoneNumber1.getText().toString().isEmpty() == false) {
+            if (phoneNumberOneEditText.getText().toString().isEmpty() == false) {
                 sms.sendTextMessage(
-                        phoneNumber1.getText().toString(),
+                        phoneNumberOneEditText.getText().toString(),
                         null,
                         message,
                         null,
@@ -80,9 +77,9 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the second number if isn't empty.
-            if (phoneNumber2.getText().toString().isEmpty() == false) {
+            if (phoneNumberTwoEditText.getText().toString().isEmpty() == false) {
                 sms.sendTextMessage(
-                        phoneNumber2.getText().toString(),
+                        phoneNumberTwoEditText.getText().toString(),
                         null,
                         message,
                         null,
@@ -90,9 +87,9 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the third number if isn't empty
-            if ((phoneNumber3.getText().toString().isEmpty() == false)) {
+            if ((phoneNumberThreeEditText.getText().toString().isEmpty() == false)) {
                 sms.sendTextMessage(
-                        phoneNumber3.getText().toString(),
+                        phoneNumberThreeEditText.getText().toString(),
                         null,
                         message,
                         null,
@@ -101,15 +98,6 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "ההרשאה אושרה", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "יש צורך בהרשאה לשליחת SMS כדי שההודעה תשלח", Toast.LENGTH_SHORT).show();
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     @Override
     public void onClick(View v) {
@@ -122,7 +110,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
         }
 
         if (checkIfAllNone_EmptyNumbersAreValid() == true) {
-            if (textMessage.getText().toString().isEmpty() == false) {
+            if (textMessageEditText.getText().toString().isEmpty() == false) {
 
                 // To check if permission was granted
                 if (ContextCompat.checkSelfPermission(Contact.this,
@@ -148,8 +136,8 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
 
     private boolean allNumbersAreEmpty() {
-        return phoneNumber1.getText().toString().isEmpty() &&
-                phoneNumber2.getText().toString().isEmpty() && phoneNumber3.getText().toString().isEmpty();
+        return phoneNumberOneEditText.getText().toString().isEmpty() &&
+                phoneNumberTwoEditText.getText().toString().isEmpty() && phoneNumberThreeEditText.getText().toString().isEmpty();
     }
 
     private boolean checkIfAllNone_EmptyNumbersAreValid() {
@@ -160,23 +148,23 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
 
         //To change the color of the EditText to red if the number isn't empty and isn't israeli.
-        if (phoneNumber1.getText().toString().isEmpty() == false) {
+        if (phoneNumberOneEditText.getText().toString().isEmpty() == false) {
 
-            if (phoneNumber1.getText().toString().matches(regex) == false) {
+            if (phoneNumberOneEditText.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
 
-        if (phoneNumber2.getText().toString().isEmpty() == false) {
+        if (phoneNumberTwoEditText.getText().toString().isEmpty() == false) {
 
-            if (phoneNumber2.getText().toString().matches(regex) == false) {
+            if (phoneNumberTwoEditText.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
 
-        if (phoneNumber3.getText().toString().isEmpty() == false) {
+        if (phoneNumberThreeEditText.getText().toString().isEmpty() == false) {
 
-            if (phoneNumber3.getText().toString().matches(regex) == false) {
+            if (phoneNumberThreeEditText.getText().toString().matches(regex) == false) {
                 return false;
             }
         }
@@ -189,10 +177,10 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
     private void saveDataToSharedPref() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(MESSAGE, textMessage.getText().toString());
-        editor.putString(PHONE_NUMBER_1, phoneNumber1.getText().toString());
-        editor.putString(PHONE_NUMBER_2, phoneNumber2.getText().toString());
-        editor.putString(PHONE_NUMBER_3, phoneNumber3.getText().toString());
+        editor.putString(MESSAGE, textMessageEditText.getText().toString());
+        editor.putString(PHONE_NUMBER_1, phoneNumberOneEditText.getText().toString());
+        editor.putString(PHONE_NUMBER_2, phoneNumberTwoEditText.getText().toString());
+        editor.putString(PHONE_NUMBER_3, phoneNumberThreeEditText.getText().toString());
         editor.apply();
     }
 

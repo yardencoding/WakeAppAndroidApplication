@@ -27,14 +27,14 @@ public class MazeView extends View {
 
     private float horizontalMargin, verticalMargin;
 
-    private int cellSize;
+    private final int cellSize = 100;
     private Cell[][] cells;
     private Paint paint, playerPaint;
 
     private Random random;
 
     private Cell player, exist;
-    private Bitmap flag_maze;
+    private Bitmap exist_box_maze;
 
     private RectF oval;
 
@@ -53,32 +53,48 @@ public class MazeView extends View {
         playerPaint.setColor(Color.GREEN);
 
         random = new Random();
-        flag_maze = BitmapFactory.decodeResource(getResources(), R.drawable.flag_maze);
+        exist_box_maze = BitmapFactory.decodeResource(getResources(), R.drawable.exist_box_maze);
 
         oval = new RectF();
         existLocationRect = new Rect();
         existSizeRect = new Rect();
         playerRect_forInvalidate = new Rect();
-
-
         createMaze();
     }
 
 
+
+
     private void createMaze() {
+
+        //Initialize the cells array.
         cells = new Cell[ROWS][COLUMNS];
         for (int row = 0; row < ROWS; row++)
             for (int column = 0; column < COLUMNS; column++)
                 cells[row][column] = new Cell(row, column);
 
+        //player and exist cells.
+        player = cells[0][0];
+        exist = cells[ROWS - 1][COLUMNS - 1];
 
+        /*
+        The code below is used to create a path between the maze.
+        It works like this:
+
+        We start at the first cell[0][0] and make a connection to one of his neighbours,
+        by connection I mean removing the walls(leftWall, rightWall, bottomWall, topWall), setting them to false.
+        after that we add the cell to a Stack.
+
+        we keep doing this to every cell (make a connection to one of his neighbours)
+        if we have a reached a cell with no valid neighbours we backtrack to the previous cell
+        using the stack and choosing a different neighbour.
+
+        When the stack gets empty it means that we have reached every cell and created a connection between all of them.
+        */
         Cell current, next;
         Stack<Cell> stack = new Stack<>();
         current = cells[0][0];
         current.setVisited(true);
-
-        player = cells[0][0];
-        exist = cells[ROWS - 1][COLUMNS - 1];
 
         do {
             next = getNeighbour(current);
@@ -95,18 +111,24 @@ public class MazeView extends View {
     }
 
     private void removeWall(Cell current, Cell next) {
+
+        //remove current cell top wall
         if (current.getColumn() == next.getColumn() && current.getRow() == next.getRow() + 1) {
             current.setTopWall(false);
             next.setBottomWall(false);
         }
+        //remove current cell bottom wall
         if (current.getColumn() == next.getColumn() && current.getRow() == next.getRow() - 1) {
             current.setBottomWall(false);
             next.setTopWall(false);
         }
+        //remove current cell left wall
         if (current.getColumn() == next.getColumn() + 1 && current.getRow() == next.getRow()) {
             current.setLeftWall(false);
             next.setRightWall(false);
         }
+
+        //remove current cell right wall
         if (current.getColumn() == next.getColumn() - 1 && current.getRow() == next.getRow()) {
             current.setRightWall(false);
             next.setLeftWall(false);
@@ -149,19 +171,13 @@ public class MazeView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int width = getWidth();
-        int height = getHeight();
-
-        if (width / height < COLUMNS / ROWS)
-            cellSize = width / (COLUMNS + 1);
-        else
-            cellSize = height / (ROWS + 1);
-
         //calculate view horizontal margin
-        horizontalMargin = (width - COLUMNS * cellSize) / 2;
+        horizontalMargin = (float)(getWidth() - COLUMNS * cellSize) / 2;
         //calculate view vertical margin
-        verticalMargin = (height - ROWS * cellSize) / 2;
+        verticalMargin = (float)(getHeight() - ROWS * cellSize) / 2;
 
+        //So that we do not have to add the horizontalMargin and verticalMargin every time.
+        // It will instead adjust the canvas location based on them.
         canvas.translate(horizontalMargin, verticalMargin);
 
         //draw lines, after we have called createMaze() and created a path.
@@ -188,7 +204,7 @@ public class MazeView extends View {
                 (player.getRow() + 1) * cellSize - playerMargin);
         canvas.drawOval(oval, playerPaint);
 
-        //draw exist
+        //draw exist image.
         existLocationRect.set(
                 exist.getColumn() * cellSize,
                 exist.getRow() * cellSize,
@@ -196,7 +212,7 @@ public class MazeView extends View {
                 (exist.getRow() + 1) * cellSize
         );
         existSizeRect.set(0, 0, (int) cellSize, (int) cellSize);
-        canvas.drawBitmap(flag_maze, existSizeRect, existLocationRect, null);
+        canvas.drawBitmap(exist_box_maze, existSizeRect, existLocationRect, null);
     }
 
         public void moveRight() {

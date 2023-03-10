@@ -2,8 +2,6 @@ package com.example.wakeup;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -20,28 +18,24 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class CheckSmile extends Fragment implements View.OnClickListener, OnSuccessListener<List<FirebaseVisionFace>>, OnFailureListener{
 
-    private Button open_camera_button;
-    private ImageView user_photo_imageView;
+    private Button openCameraButton;
+    private ImageView userPhotoImageView;
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     private Bitmap bitmap;
@@ -56,9 +50,9 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        open_camera_button = view.findViewById(R.id.open_camera_button);
-        user_photo_imageView = view.findViewById(R.id.user_photo_imageView);
-        open_camera_button.setOnClickListener(this);
+        openCameraButton = view.findViewById(R.id.open_camera_button);
+        userPhotoImageView = view.findViewById(R.id.user_photo_image_view);
+        openCameraButton.setOnClickListener(this);
 
         activityForResult();
     }
@@ -74,7 +68,7 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
                         if(result.getResultCode() == RESULT_OK && result.getData() != null){
                             Bundle bundle = result.getData().getExtras();
                              bitmap = (Bitmap) bundle.get("data");
-                            user_photo_imageView.setImageBitmap(bitmap);
+                            userPhotoImageView.setImageBitmap(bitmap);
                             detectSmile();
                         }
                     }

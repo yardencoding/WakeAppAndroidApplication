@@ -16,12 +16,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -32,8 +27,8 @@ import java.util.ArrayList;
 
 public class MainScreen extends AppCompatActivity implements RecyclerViewInterface, View.OnClickListener {
 
-    private RecyclerView recyclerView;
-    private TextView firstMessage;
+    private RecyclerView alarmsRecyclerView;
+    private TextView firstMessageTextView;
     public static ArrayList<Alarm> alarmList;
     public static AlarmAdapter adapter;
     private Thread updateAlarmTime_thread;
@@ -54,23 +49,23 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         setContentView(R.layout.activity_main_screen);
 
         //Add alarm button
-        addAlarmButton = findViewById(R.id.add_btn);
+        addAlarmButton = findViewById(R.id.add_alarm_button);
         addAlarmButton.setOnClickListener(this);
 
 
         // "התראות" text
-        firstMessage = findViewById(R.id.first_message);
+        firstMessageTextView = findViewById(R.id.first_message_text_view);
 
 
         // Contains data from SQLite Database
         alarmList = new ArrayList<Alarm>();
 
         // build RecyclerView
-        recyclerView = findViewById(R.id.alarms_recyclerView);
+        alarmsRecyclerView = findViewById(R.id.alarms_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        alarmsRecyclerView.setLayoutManager(layoutManager);
         adapter = new AlarmAdapter(alarmList, this);
-        recyclerView.setAdapter(adapter);
+        alarmsRecyclerView.setAdapter(adapter);
 
 
         //Download alarms from Database and display on recyclerView
@@ -163,15 +158,15 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
         if (alarm != null) {
-            firstMessage.setText(alarm.getHowMuchTimeTillAlarm());
+            firstMessageTextView.setText(alarm.getHowMuchTimeTillAlarm());
             startForegroundService(statusBarService);
         } else {
             stopService(statusBarService);
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
             if (alarmList.isEmpty() == false)
-                firstMessage.setText("כל ההתראות כבויות");
+                firstMessageTextView.setText("כל ההתראות כבויות");
             else
-                firstMessage.setText("התראות");
+                firstMessageTextView.setText("התראות");
         }
     }
 
@@ -184,16 +179,11 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     @Override
     public void onClick(View v) {
-        /*
+
         //When add button is clicked
         Intent intent = new Intent(this, CreateAlarm.class);
         intent.putParcelableArrayListExtra("AlarmList", alarmList);
         startActivity(intent);
-         */
-
-        //untill I will finish the maze game
-        startActivity(new Intent(this, HoldFragmentsActivity.class));
-
     }
 
     private void requestNotificationPermission() {

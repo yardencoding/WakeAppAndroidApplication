@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.example.wakeup.MazeView
-        android:id="@+id/mazeView"
+        android:id="@+id/maze_view"
         android:layout_width="match_parent"
         android:layout_height="400dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,27 +35,27 @@
     </com.example.wakeup.MazeView>
 
     <ImageButton
-        android:id="@+id/left_btn"
+        android:id="@+id/move_left_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/left_arrow"
         android:background="@color/transparent"
-        app:layout_constraintEnd_toStartOf="@+id/down_btn"
+        app:layout_constraintEnd_toStartOf="@+id/move_down_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/up_btn" />
+        app:layout_constraintTop_toBottomOf="@+id/move_up_button" />
 
     <ImageButton
-        android:id="@+id/right_btn"
+        android:id="@+id/move_right_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/right_arrow"
         android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/down_btn"
-        app:layout_constraintTop_toBottomOf="@+id/up_btn" />
+        app:layout_constraintStart_toEndOf="@+id/move_down_button"
+        app:layout_constraintTop_toBottomOf="@+id/move_up_button" />
 
     <ImageButton
-        android:id="@+id/up_btn"
+        android:id="@+id/move_up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -63,10 +63,10 @@
         android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mazeView" />
+        app:layout_constraintTop_toBottomOf="@+id/maze_view" />
 
     <ImageButton
-        android:id="@+id/down_btn"
+        android:id="@+id/move_down_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/down_arrow"
@@ -74,7 +74,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/up_btn" />
+        app:layout_constraintTop_toBottomOf="@+id/move_up_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

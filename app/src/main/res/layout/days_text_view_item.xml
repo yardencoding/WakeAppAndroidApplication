@@ -10,7 +10,7 @@
 
 
     <TextView
-        android:id="@+id/saturday_tv"
+        android:id="@+id/saturday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ש'"
@@ -19,7 +19,7 @@
         />
 
     <TextView
-        android:id="@+id/friday_tv"
+        android:id="@+id/friday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ו'"
@@ -29,7 +29,7 @@
         />
 
     <TextView
-        android:id="@+id/thursday_tv"
+        android:id="@+id/thursday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ה'"
@@ -38,7 +38,7 @@
         android:layout_marginLeft="@dimen/days_text_view_space"/>
 
     <TextView
-        android:id="@+id/wednesday_tv"
+        android:id="@+id/wednesday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/days_text_view_space"
@@ -47,7 +47,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tuesday_tv"
+        android:id="@+id/tuesday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ג'"
@@ -57,7 +57,7 @@
 
 
     <TextView
-        android:id="@+id/monday_tv"
+        android:id="@+id/monday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ב'"
@@ -67,7 +67,7 @@
 
 
     <TextView
-        android:id="@+id/sunday_tv"
+        android:id="@+id/sunday_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="א'"

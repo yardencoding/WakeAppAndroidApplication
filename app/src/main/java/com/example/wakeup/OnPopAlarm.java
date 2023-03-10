@@ -1,34 +1,29 @@
 package com.example.wakeup;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 
-public class OnPopAlarm extends Fragment implements View.OnClickListener{
+public class OnPopAlarm extends Fragment implements View.OnClickListener {
 
-    private Button stopAlarmServiceBtn;
-    private TextView cancel_alarm_textView, show_time_tv;
+    private Button stopAlarmServiceButton;
+    private TextView cancelAlarmTextView, showCurrentTimeTextView;
 
     private Handler timeHandler;
 
@@ -45,20 +40,20 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        stopAlarmServiceBtn = view.findViewById(R.id.stop_alarm_Service_btn);
-        cancel_alarm_textView = view.findViewById(R.id.cancel_alarm_textView);
-        show_time_tv = view.findViewById(R.id.show_time_tv);
-        stopAlarmServiceBtn.setOnClickListener(this);
+        stopAlarmServiceButton = view.findViewById(R.id.stop_alarm_Service_button);
+        cancelAlarmTextView = view.findViewById(R.id.cancel_alarm_textView);
+        showCurrentTimeTextView = view.findViewById(R.id.show_current_time_text_view);
+        stopAlarmServiceButton.setOnClickListener(this);
 
         poppedAlarm = getActivity().getIntent().getParcelableExtra("alarmToPopScreen");
 
-       String name = poppedAlarm.getName();
+        String name = poppedAlarm.getName();
 
-        if(!name.isEmpty())
-            cancel_alarm_textView.setText(name);
+        if (!name.isEmpty())
+            cancelAlarmTextView.setText(name);
 
-        if(poppedAlarm.hasMission())
-           cancel_alarm_textView.setText("התחל משימה");
+        if (poppedAlarm.hasMission())
+            cancelAlarmTextView.setText("התחל משימה");
 
         timeHandler = new Handler();
 
@@ -68,25 +63,24 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
         getActivity().startForegroundService(startAlarmService);
 
 
-   }
+    }
 
 
+    private Runnable updateTimeTask = new Runnable() {
+        @Override
+        public void run() {
+            showCurrentTimeTextView.setText(getCurrentTime());
+            // schedule the task to run again after 1 minute
+            timeHandler.postDelayed(this, 60_000);
+        }
+    };
 
-   private Runnable updateTimeTask = new Runnable() {
-       @Override
-       public void run() {
-           show_time_tv.setText(getCurrentTime());
-           // schedule the task to run again after 1 minute
-           timeHandler.postDelayed(this, 60_000);
-       }
-   };
 
-
-    private String getCurrentTime(){
+    private String getCurrentTime() {
         int hour = LocalDateTime.now().getHour();
         int minute = LocalDateTime.now().getMinute();
         return String.format("%02d:%02d", hour, minute);
-   }
+    }
 
 
     @Override
@@ -105,19 +99,22 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         //Go to checkSmile fragment
-        if (poppedAlarm.hasMission()){
-            //Until I finish the maze game
-          //  Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
+        if (poppedAlarm.hasMission()) {
+            if (poppedAlarm.getMission().equals(" צילום חיוך")) {
+                Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
+            } else if (poppedAlarm.getMission().equals(" פתירת מבוך")) {
+                Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_mazeGame);
+            } else ;// צילום פנים רטובות
 
-        } else{
+
+        } else {
             //Stop alarm service
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
-            getActivity().finishAndRemoveTask();
+            getActivity().finish();
 
 
         }
     }
-
 
 
 }
