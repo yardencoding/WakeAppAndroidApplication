@@ -241,13 +241,13 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     alarmContactsSwitch.isChecked()
             );
 
-            if (newAlarm.hasNoChosenDay())
+            if(newAlarm.hasNoChosenDay())
                 newAlarm.whenNoDay_WasChosen();
 
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
 
 
-            //set the id of the new alarm the AlarmList.
+            //set the id of the new alarm based on the AlarmList size.
             int newAlarmId;
             if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
                 getClickedAlarm().cancel(this);
@@ -363,7 +363,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm) {
         //To check if the newAlarm dose not already exists.
         alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
-        if (!(newAlarm.alreadyExist(alarmList_FromIntent))) {
+        if (!newAlarm.alreadyExist(alarmList_FromIntent)) {
 
 
             if (getClickedAlarm() == null) {
@@ -380,7 +380,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         } else {
             //Toast message that says alarm already exist
-            Toast.makeText(CreateAlarm.this, newAlarm.toString() + " כבר הוגדרה", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CreateAlarm.this,
+                    "לא ניתן ליצור את ההתראה, משום שהיא מתנגשת עם התראה קיימת ",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -410,12 +412,14 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         if (isChecked) {
 
             // If I the alarmMissionSwitch is checked and I didn't choose a mission yet, open the mission dialog.
-            if (buttonView.getId() == alarmMissionSwitch.getId())
+            if (buttonView.getId() == alarmMissionSwitch.getId()) {
                 if (alarmMissionNameTextView.getText().toString().isEmpty())
                     showMissionDialog();
 
-                else if (buttonView.getId() == alarmContactsSwitch.getId())
-                    requestSendSmsPermission();
+            } else{
+                //alarmContactsSwitch
+                requestSendSmsPermission();
+            }
         }
     }
 

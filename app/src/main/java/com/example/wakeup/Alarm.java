@@ -22,7 +22,6 @@ import java.util.Objects;
 public class Alarm implements Parcelable {
 
 
-
     //Alarm fields
     private int id;
     private String name;
@@ -31,10 +30,9 @@ public class Alarm implements Parcelable {
     private int minute;
     private boolean active;
     private boolean sunday, monday, tuesday, wednesday, thursday, friday, saturday;
-    private boolean hasSound, hasVibrate, hasMission,hasUseMyContacts;
+    private boolean hasSound, hasVibrate, hasMission, hasUseMyContacts;
 
     private int volume;
-
 
 
     // initialize alarm with id, name, mission, hour, minute and which days it will run
@@ -76,8 +74,6 @@ public class Alarm implements Parcelable {
     // Sometimes an empty constructor is needed.
     public Alarm() {
     }
-
-
 
 
     public void setId(int id) {
@@ -189,11 +185,17 @@ public class Alarm implements Parcelable {
         return saturday;
     }
 
-    public boolean hasSound() {return hasSound;}
+    public boolean hasSound() {
+        return hasSound;
+    }
 
-    public boolean hasVibrate() {return hasVibrate;}
+    public boolean hasVibrate() {
+        return hasVibrate;
+    }
 
-    public boolean hasMission() {return hasMission;}
+    public boolean hasMission() {
+        return hasMission;
+    }
 
     public String getSoundName() {
         return soundName;
@@ -203,17 +205,25 @@ public class Alarm implements Parcelable {
         this.soundName = soundName;
     }
 
-    public boolean hasUseMyContacts() {return hasUseMyContacts;}
+    public boolean hasUseMyContacts() {
+        return hasUseMyContacts;
+    }
 
-    public void setHasSound(boolean hasSound) {this.hasSound = hasSound;}
+    public void setHasSound(boolean hasSound) {
+        this.hasSound = hasSound;
+    }
 
-    public void setHasVibrate(boolean hasVibrate) {this.hasVibrate = hasVibrate;}
+    public void setHasVibrate(boolean hasVibrate) {
+        this.hasVibrate = hasVibrate;
+    }
 
-    public void setHasMission (boolean hasMission){this.hasMission = hasMission;}
+    public void setHasMission(boolean hasMission) {
+        this.hasMission = hasMission;
+    }
 
-    public void setHasUseMyContacts(boolean hasUseMyContacts) {this.hasUseMyContacts = hasUseMyContacts;}
-
-
+    public void setHasUseMyContacts(boolean hasUseMyContacts) {
+        this.hasUseMyContacts = hasUseMyContacts;
+    }
 
 
     // Alarm methods:
@@ -225,7 +235,7 @@ public class Alarm implements Parcelable {
         // WeekFields.SUNDAY_START because the default first day is Monday, and here in Israel we start at sunday.
         int index = localDateTime.getDayOfWeek().get(WeekFields.SUNDAY_START.dayOfWeek());
         //Increment day by one, if alarm is on current day and time passed.
-        if(timeHasAlreadyPassed())
+        if (timeHasAlreadyPassed())
             localDateTime = localDateTime.plusDays(1);
 
         while (daysArray[index] == false) {
@@ -277,8 +287,10 @@ public class Alarm implements Parcelable {
     }
 
 
+
+
     // Add the alarm day to the corresponding day attribute.
-    private void setAlarmDay_manually(DayOfWeek dayOfWeek) {
+    public void setAlarmDay_manually(DayOfWeek dayOfWeek) {
         if (dayOfWeek == DayOfWeek.SUNDAY)
             setSunday(true);
         if (dayOfWeek == DayOfWeek.MONDAY)
@@ -323,16 +335,12 @@ public class Alarm implements Parcelable {
         });
     }
 
+    //Iterates over the entire alarm list and checks if the alarm that called this method is equal to one of them.
+    //By equal I mean has the same time and at least one matching day
     public boolean alreadyExist(ArrayList<Alarm> alarmArrayList) {
-        if(alarmArrayList.size() <= 1) //Because the alarm will always be equal to itself
-            return false;
-
         for (int i = 0; i < alarmArrayList.size(); i++)
-            if (alarmArrayList.get(i).equals(this))
-                return true;
-
+            return this.equals(alarmArrayList.get(i));
         return false;
-
     }
 
     public LocalDateTime getAlarmLocalDateTime() {
@@ -344,7 +352,6 @@ public class Alarm implements Parcelable {
         alarmLocalDateTime = alarmLocalDateTime.withMinute(getMinute());
         return alarmLocalDateTime;
     }
-
 
 
     public void setActive(boolean active) {
@@ -425,39 +432,50 @@ public class Alarm implements Parcelable {
         return firstActive;
     }
 
-     public void schedule(Context context){
+    public void schedule(Context context) {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("alarmToBroadcastReceiver", this);
         long milliseconds = this.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id , intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(milliseconds, pendingIntent);
         alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
     }
 
-    public void cancel(Context context){
+    public void cancel(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id , intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id, intent, PendingIntent.FLAG_IMMUTABLE);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
 
     }
 
 
-    // Returns true if  two alarms has the same Hour, Minute and Days.
+    // Returns true if two alarms has the same Hour, Minute and at least one matching day.
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Alarm alarm = (Alarm) object;
-        return hour == alarm.hour && minute == alarm.minute && sunday == alarm.sunday && monday == alarm.monday && tuesday == alarm.tuesday && wednesday == alarm.wednesday && thursday == alarm.thursday && friday == alarm.friday && saturday == alarm.saturday;
+        if (this.getHour() == alarm.getHour())
+            if (this.getMinute() == alarm.getMinute())
+                return (this.sunday && alarm.isSunday())
+                        || (this.monday && alarm.isMonday())
+                        || (this.tuesday && alarm.isTuesday())
+                        || (this.wednesday && alarm.isWednesday())
+                        || (this.thursday && alarm.isThursday())
+                        || (this.friday && alarm.isFriday())
+                        || (this.saturday && alarm.isSaturday())
+                        ;
+
+        return false;
     }
 
     @Override
     public int hashCode() {
-       return Objects.hash(hour, minute, sunday, monday, tuesday, wednesday, thursday, friday, saturday);
+        return Objects.hash(hour, minute, sunday, monday, tuesday, wednesday, thursday, friday, saturday);
     }
 
 
@@ -526,6 +544,7 @@ public class Alarm implements Parcelable {
 
     @Override
     public String toString() {
+
         String time = String.format("%02d:%02d", getHour(), getMinute());
         String s1 = "התראה לשעה";
 
@@ -569,14 +588,6 @@ public class Alarm implements Parcelable {
             // ^^ those are just examples
         }
     }
-
-
-
-
-
-
-
-
 
 
 }

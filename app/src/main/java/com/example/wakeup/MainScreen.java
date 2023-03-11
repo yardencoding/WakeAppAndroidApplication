@@ -56,9 +56,15 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         // "התראות" text
         firstMessageTextView = findViewById(R.id.first_message_text_view);
 
-
         // Contains data from SQLite Database
         alarmList = new ArrayList<Alarm>();
+
+        //Download alarms from Database and display on recyclerView
+        DataBaseHelper.database = new DataBaseHelper(MainScreen.this);
+        alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
+
+        //Sorting them so the closest one will always be on top
+        Alarm.sortAlarms(alarmList);
 
         // build RecyclerView
         alarmsRecyclerView = findViewById(R.id.alarms_recycler_view);
@@ -67,14 +73,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         adapter = new AlarmAdapter(alarmList, this);
         alarmsRecyclerView.setAdapter(adapter);
 
-
-        //Download alarms from Database and display on recyclerView
-        DataBaseHelper.database = new DataBaseHelper(MainScreen.this);
-        alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
-
-        //Sorting them so the closest one will be on top
-        Alarm.sortAlarms(alarmList);
-        adapter.notifyDataSetChanged();
 
         updateFirstMessage_thread();
 
