@@ -37,6 +37,7 @@ public class StatusBarNotificationService extends Service {
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .build();
+
     }
 
     @Override

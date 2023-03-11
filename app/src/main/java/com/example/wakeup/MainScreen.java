@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -40,7 +41,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     public static final int SEND_SMS_REQUEST_CODE = 3;
 
     public static final int CAMERA_REQUEST_CODE = 4;
-
 
 
     @Override
@@ -159,7 +159,8 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
             firstMessageTextView.setText(alarm.getHowMuchTimeTillAlarm());
             startForegroundService(statusBarService);
         } else {
-            stopService(statusBarService);
+            if (isStatusBarNotificationServiceRunning())
+                stopService(statusBarService);
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
             if (alarmList.isEmpty() == false)
                 firstMessageTextView.setText("כל ההתראות כבויות");
@@ -190,27 +191,35 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                 PackageManager.PERMISSION_DENIED
         )
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_REQUEST_CODE);
-      }
+    }
 
 
     //Notification channel, needed for sdk 26 and above
-    private void createNotificationChannel(){
-          NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-          NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_MIN);
-          notificationManager.createNotificationChannel(notificationChannel);
-      }
+    private void createNotificationChannel() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_MIN);
+        notificationManager.createNotificationChannel(notificationChannel);
+    }
 
     private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK) {
                 Toast.makeText(MainScreen.this, "כעת האפליקציה תוכל להציג התראות מעל אפליקציות אחרות", Toast.LENGTH_SHORT).show();
-            } else{
-               Toast.makeText(MainScreen.this, "האפליקציה לא תוכל להציג התראות מעל אפליקציות אחרות", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainScreen.this, "האפליקציה לא תוכל להציג התראות מעל אפליקציות אחרות", Toast.LENGTH_SHORT).show();
             }
         }
     });
 
+    private boolean isStatusBarNotificationServiceRunning() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (StatusBarNotificationService.class.getName().equals(serviceInfo.service.getClassName()))
+                return true;
+        }
+        return false;
+    }
 
 
 }

@@ -62,8 +62,13 @@ public class AlarmService extends Service {
                 throw new RuntimeException(e);
             }
             mediaPlayer.setLooping(true);
+
+            //to set the volume to be 40% if the device max volume.
             AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, alarm.getVolume(), 0);
+            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int thirtyPercentVolume = (int) Math.ceil(0.4 * maxVolume);
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, thirtyPercentVolume, 0);
+
             mediaPlayer.start();
         }
 
@@ -100,6 +105,7 @@ public class AlarmService extends Service {
         }
         if(alarm.hasVibrate()) {
             vibrator.cancel();
+
         }
         super.onDestroy();
     }

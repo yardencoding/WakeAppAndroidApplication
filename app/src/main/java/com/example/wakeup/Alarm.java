@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -32,10 +33,9 @@ public class Alarm implements Parcelable {
     private boolean sunday, monday, tuesday, wednesday, thursday, friday, saturday;
     private boolean hasSound, hasVibrate, hasMission, hasUseMyContacts;
 
-    private int volume;
 
 
-    // initialize alarm with id, name, mission, hour, minute and which days it will run
+    // initialize an alarm with id, name, mission, hour, minute and which days it will run
     public Alarm(boolean active, int hour, int minute, String name, String mission, String soundName,
                  boolean sunday,
                  boolean monday,
@@ -105,13 +105,8 @@ public class Alarm implements Parcelable {
         return active;
     }
 
-    public int getVolume() {
-        return volume;
-    }
 
-    public void setVolume(int volume) {
-        this.volume = volume;
-    }
+
 
     public boolean isSunday() {
         return sunday;
@@ -234,9 +229,12 @@ public class Alarm implements Parcelable {
         boolean[] daysArray = getDaysArray();
         // WeekFields.SUNDAY_START because the default first day is Monday, and here in Israel we start at sunday.
         int index = localDateTime.getDayOfWeek().get(WeekFields.SUNDAY_START.dayOfWeek());
-        //Increment day by one, if alarm is on current day and time passed.
-        if (timeHasAlreadyPassed())
+
+        //if alarm's time passed increment the day by 1.
+        if(timeHasAlreadyPassed()) {
             localDateTime = localDateTime.plusDays(1);
+            index = localDateTime.getDayOfWeek().get(WeekFields.SUNDAY_START.dayOfWeek());
+        }
 
         while (daysArray[index] == false) {
             //Move to the next day
@@ -345,9 +343,14 @@ public class Alarm implements Parcelable {
 
     public LocalDateTime getAlarmLocalDateTime() {
         LocalDateTime alarmLocalDateTime = LocalDateTime.now();
-        //nextOrSame because if the day had already passed move to the next week,
-        // and if not stay in this week.
-        alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.nextOrSame(getClosestToCurrentDay()));
+        //if the time has already passed change to day to the next week
+        //otherwise keep it this week.
+        if(timeHasAlreadyPassed()) {
+            alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.next(getClosestToCurrentDay()));
+        } else {
+            alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.nextOrSame(getClosestToCurrentDay()));
+        }
+
         alarmLocalDateTime = alarmLocalDateTime.withHour(getHour());
         alarmLocalDateTime = alarmLocalDateTime.withMinute(getMinute());
         return alarmLocalDateTime;

@@ -62,7 +62,6 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
         startAlarmService.putExtra("alarmToServiceFromPoppedScreen", poppedAlarm);
         getActivity().startForegroundService(startAlarmService);
 
-
     }
 
 

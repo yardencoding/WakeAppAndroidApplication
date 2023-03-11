@@ -33,6 +33,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
+
 import java.util.ArrayList;
 
 public class CreateAlarm extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -51,8 +54,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     private boolean hasSelectedTime = false;
 
-
-    private int maxVolume;
 
     private ArrayList<Alarm> alarmList_FromIntent;
 
@@ -102,8 +103,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         chooseSoundPreferences = getSharedPreferences(ChooseSound.SHARED_PREFS, MODE_PRIVATE);
         alarmSoundNameTextView.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
 
-        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
 
         //If we opened this activity through an alarm click. change the fields to match alarm fields.
         if (getClickedAlarm() != null)
@@ -119,27 +118,19 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     // crates a timePicker dialog when "בחר שעה" btn is clicked
     private void popTimePicker() {
-        // when the user has finished choosing the time
-        TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                hasSelectedTime = true;
-                hour = selectedHour;
-                minute = selectedMinute;
-                chooseTimeButton.setTextSize(35);
-                chooseTimeButton.setText(String.format("%02d:%02d", hour, minute));
 
-            }
-        };
+        MaterialTimePicker materialTimePicker = new
+                MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H).setHour(hour).setMinute(minute).setTheme(R.style.ThemeOverlay_MaterialComponents_TimePicker).build();
+        materialTimePicker.addOnPositiveButtonClickListener(view -> {
+            hasSelectedTime = true;
 
-        final int SPINNER_MODE = 2;
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                SPINNER_MODE,
-                onTimeSetListener,
-                hour, minute,
-                true);
+            hour = materialTimePicker.getHour();
+            minute = materialTimePicker.getMinute();
+            chooseTimeButton.setTextSize(38);
+            chooseTimeButton.setText(String.format("%02d:%02d", hour, minute));
 
-        timePickerDialog.show();
+        });
+        materialTimePicker.show(getSupportFragmentManager(), null);
 
     }
 
@@ -241,7 +232,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     alarmContactsSwitch.isChecked()
             );
 
-            if(newAlarm.hasNoChosenDay())
+            if (newAlarm.hasNoChosenDay())
                 newAlarm.whenNoDay_WasChosen();
 
             addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
@@ -257,7 +248,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             }
 
             // schedule the alarm
-            newAlarm.setVolume(chooseSoundPreferences.getInt(ChooseSound.SOUND_VOLUME, 60) / (100 / maxVolume));
             newAlarm.setId(newAlarmId);
             newAlarm.schedule(this);
 
@@ -363,6 +353,15 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm) {
         //To check if the newAlarm dose not already exists.
         alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
+
+        //if we opened this activity through an alarm click, and the alarmList size is one, meaning there is only one alarm.
+        // Skip the alreadyExist check because the alarm is equal to itself
+        if (getClickedAlarm() != null && alarmList_FromIntent.size() == 1) {
+            //Change clicked alarm settings. When we opened this activity through an alarm click.
+            DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
+            return;
+        }
+
         if (!newAlarm.alreadyExist(alarmList_FromIntent)) {
 
 
@@ -398,12 +397,13 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         }
     });
 
-    //When I come back from ChooseSound or Contacts
+    //When I come back from ChooseSound
     @Override
     protected void onResume() {
         super.onResume();
         //Change alarm sound name to the last chosen one. If there is no chosen song put "Homecoming"
         alarmSoundNameTextView.setText(chooseSoundPreferences.getString(ChooseSound.SOUND_NAME, "Homecoming"));
+
 
     }
 
@@ -416,7 +416,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 if (alarmMissionNameTextView.getText().toString().isEmpty())
                     showMissionDialog();
 
-            } else{
+            } else {
                 //alarmContactsSwitch
                 requestSendSmsPermission();
             }

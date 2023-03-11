@@ -13,30 +13,22 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.slider.LabelFormatter;
-import com.google.android.material.slider.Slider;
 
 import java.io.IOException;
 
 public class ChooseSound extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageButton playAudioButton, volumeImageButton, saveSoundImageButton;
-    private Slider soundSlider;
+    private ImageButton playAudioButton, saveSoundImageButton;
     private RadioGroup soundNamesRadioGroup;
 
     private RadioButton clickedRadioButton;
     private MediaPlayer mediaPlayer;
-    private AudioManager audioManager;
-    private int maxAlarmStreamVolume;
 
     //To store the sound name in SharedPreferences
 
     public static final String SHARED_PREFS = "CHOOSE_SOUND_SHARED_PREF";
     public static final String SOUND_NAME = "SOUND_NAME";
-    public static final String SOUND_VOLUME = "SOUND_VOlUME";
 
     private String currentSoundName;
 
@@ -54,6 +46,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                     clickedRadioButton = findViewById(checkedId);
+                    mediaPlayer.stop();
                     mediaPlayer.reset();
             }
         });
@@ -61,24 +54,10 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
         //ImageButtons
         playAudioButton = findViewById(R.id.play_audio_button);
-        volumeImageButton = findViewById(R.id.volume_image_button);
         saveSoundImageButton = findViewById(R.id.save_sound_image_button);
 
         playAudioButton.setOnClickListener(this);
-        volumeImageButton.setOnClickListener(this);
         saveSoundImageButton.setOnClickListener(this);
-
-
-        //Slider
-        soundSlider = findViewById(R.id.sound_slider);
-        soundSlider.setValue(getIntent().getIntExtra("soundVolume_fromCreateAlarm", 60));
-        initializeSliderListeners();
-
-        //AudioManager
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        maxAlarmStreamVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, (int)soundSlider.getValue() / (100 / maxAlarmStreamVolume), 0);
-
 
         //Initialize a MediaPlayer obj with audio attributes.
         mediaPlayer = new MediaPlayer();
@@ -88,7 +67,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         mediaPlayer.setLooping(true);
 
 
-        loadDataFromSharedPreferences();
+        loadSoundName();
 
         searchForRadioButton_WithSameSoundName();
     }
@@ -138,57 +117,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    private void initializeSliderListeners() {
-
-
-        soundSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-
-                // Responds when the slider is being start
-                soundSlider.setTrackHeight(20);
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                // Responds when the slider is being stopped
-                soundSlider.setTrackHeight(12);
-            }
-        });
-
-
-        //Cast slider label values from decimals to (int).
-        soundSlider.setLabelFormatter(new LabelFormatter() {
-            @NonNull
-            @Override
-            public String getFormattedValue(float value) {
-                return (int) value + "%";
-            }
-        });
-
-
-        //When slider value changed
-        soundSlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float newValue, boolean fromUser) {
-                // checks if the newValue is smaller than the minimum stream volume.
-                if (newValue < 6) {
-                    newValue = 6;
-                    soundSlider.setValue(newValue);
-                }
-                // checks if the newValue is greater than the maximum slider value.
-                if (newValue > 100) {
-                    newValue = 100;
-                    soundSlider.setValue(newValue);
-                }
-
-
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, (int) newValue / (100 / maxAlarmStreamVolume), 0);
-            }
-        });
-    }
-
-
     @Override
     public void onClick(View view) {
 
@@ -197,11 +125,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
                 playAudio();
                 break;
 
-            case R.id.volume_image_button:
-                soundSlider.setValue(6);
-                break;
             case R.id.save_sound_image_button:
-                saveSoundNameAndVolume();
+                saveSoundName();
                 super.onBackPressed();
                 break;
 
@@ -210,6 +135,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
 
     private void playAudio(){
+
         try {
             //Set mediaPlayer sound
             mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + getSoundID(clickedRadioButton.getText().toString())));
@@ -217,6 +143,15 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //to set the volume to be 40% if the device max volume.
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int thirtyPercentVolume = (int) Math.ceil(0.4 * maxVolume);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, thirtyPercentVolume, 0);
+
+
+        mediaPlayer.setLooping(true);
         mediaPlayer.start();
 
     }
@@ -224,17 +159,15 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
 
     //sharedPreferences setup
-    private void saveSoundNameAndVolume() {
+    private void saveSoundName() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(SOUND_NAME, (String) clickedRadioButton.getText());
-        editor.putInt(SOUND_VOLUME, (int) soundSlider.getValue());
         editor.apply();
     }
 
-    private void loadDataFromSharedPreferences(){
+    private void loadSoundName(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        soundSlider.setValue(sharedPreferences.getInt(SOUND_VOLUME, 60));
         currentSoundName = sharedPreferences.getString(SOUND_NAME, "Homecoming");
     }
 
@@ -243,27 +176,18 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
 
-        int steps = 5;
+
         if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            soundSlider.setValue(soundSlider.getValue() + steps);
             return true; // Meaning I handled that event
         }
 
         if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            soundSlider.setValue(soundSlider.getValue() - steps);
             return true;// Meaning I handled that event
         }
-
         return super.dispatchKeyEvent(event);
     }
 
-    //If back button was pressed update soundId in database.
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+
 
     @Override
     public void onDestroy() {

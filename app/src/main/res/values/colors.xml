@@ -10,7 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gold">#D3AF37</color>
     <color name="daypicker_color">#2c3587</color>
-    <color name="background_color">#8e9eff</color>
+    <color name="background_color">#FFFFFF</color>
     <color name="grey">#808080</color>
     <color name="recyclerViewItemColor">#647aff</color>
     <color name="inactiveAlarm">#424242</color>
