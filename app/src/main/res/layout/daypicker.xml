@@ -19,7 +19,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="א'"
         android:textOn="א'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -31,7 +31,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ב'"
         android:textOn="ב'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -43,7 +43,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ג'"
         android:textOn="ג'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -56,7 +56,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ד'"
         android:textOn="ד'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -69,7 +69,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ה'"
         android:textOn="ה'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -82,7 +82,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ו'"
         android:textOn="ו'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         style="@style/toggleButtonStyle"/>
 
@@ -97,7 +97,7 @@
         android:background="@drawable/days_tb_background"
         android:textOff="ש'"
         android:textOn="ש'"
-        android:textSize="24sp"
+        android:textSize="@dimen/days_tb_text_size"
         android:textStyle="bold"
         />
 

@@ -10,12 +10,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gold">#D3AF37</color>
     <color name="daypicker_color">#2c3587</color>
-    <color name="background_color">#FFFFFF</color>
     <color name="grey">#808080</color>
     <color name="recyclerViewItemColor">#647aff</color>
     <color name="inactiveAlarm">#424242</color>
     <color name="transparent">#00000000</color>
     <color name="add_button_color">#38ddf0</color>
-    <color name="light_blue">#006064</color>
+    <color name="light_blue">#0CDFE8</color>
 
 </resources>
