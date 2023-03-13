@@ -62,9 +62,7 @@ public class MazeGame extends Fragment implements View.OnClickListener{
         if(mazeView.hasReachedExist()) {
             //stop  alarm service.
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
-
-            Toast.makeText(getContext(), "כל הכבוד! פתרת את המבוך", Toast.LENGTH_SHORT).show();
-            getActivity().finishAndRemoveTask();
+            getActivity().finish();
 
         }
 

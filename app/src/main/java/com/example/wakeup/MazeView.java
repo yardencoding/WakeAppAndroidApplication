@@ -23,8 +23,6 @@ public class MazeView extends View {
     private static final int ROWS = 8;
     private static final int COLUMNS = 8;
 
-    private static final int WALL_THICKNESS = 3;
-
     private float horizontalMargin, verticalMargin;
 
     private final int cellSize = 100;
@@ -47,7 +45,7 @@ public class MazeView extends View {
         super(context, attrs);
         paint = new Paint();
         paint.setColor(Color.YELLOW);
-        paint.setStrokeWidth(WALL_THICKNESS);
+        paint.setStrokeWidth(3);
 
         playerPaint = new Paint();
         playerPaint.setColor(Color.GREEN);

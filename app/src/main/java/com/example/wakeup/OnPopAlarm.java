@@ -103,7 +103,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
                 Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
             } else if (poppedAlarm.getMission().equals(" פתירת מבוך")) {
                 Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_mazeGame);
-            } else ;// צילום פנים רטובות
+            } else ;// צילום מים מהברז
 
 
         } else {

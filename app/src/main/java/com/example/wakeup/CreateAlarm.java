@@ -5,17 +5,17 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
+import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -28,7 +28,6 @@ import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -59,6 +58,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     //To get the sound name and volume from ChooseSound Activity.
     private SharedPreferences chooseSoundPreferences;
+
+    //Status bar notification id
+
 
 
     @Override
@@ -116,7 +118,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    // crates a timePicker dialog when "בחר שעה" btn is clicked
+    // Creates a timePicker dialog when "בחר שעה" btn is clicked.
     private void popTimePicker() {
 
         MaterialTimePicker materialTimePicker = new
@@ -181,9 +183,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                         case R.id.mission_dialog_maze_radio_button:
                             alarmMissionNameTextView.setText(" פתירת מבוך");
                             break;
-                        case R.id.mission_dialog_wet_face_radio_button:
+                        case R.id.mission_dialog_water_from_stream_radio_button:
                             requestCameraPermission();
-                            alarmMissionNameTextView.setText(" צילום פנים רטובות");
+                            alarmMissionNameTextView.setText(" צילום מים מהברז");
                             break;
                     }
                     dialog.dismiss();
@@ -202,11 +204,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 && timeWasChosen()
                 && makeSureThatContactsWereAdded()
                 && hasDisplayOverOtherAppsPermission()) {
-
-            // Start the statusBarService that will show a consistent icon as long as there are active alarms.
-            Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
-            startForegroundService(statusBarService);
-
 
             //Create Alarm fields
             String name = alarmNameEditText.getText().toString();
@@ -252,12 +249,17 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             newAlarm.schedule(this);
 
 
+            startForegroundService(new Intent(this, StatusBarNotificationService.class));
+
+
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
             startActivity(goToMainScreen);
 
         }
     }
+
+
 
     private boolean hasDisplayOverOtherAppsPermission() {
         if (!Settings.canDrawOverlays(this)) {
@@ -452,5 +454,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
 
     }
+
+
 
 }

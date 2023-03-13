@@ -47,10 +47,10 @@
             android:text="  פתירת מבוך" />
 
         <RadioButton
-            android:id="@+id/mission_dialog_wet_face_radio_button"
+            android:id="@+id/mission_dialog_water_from_stream_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="  צילום פנים רטובות" />
+            android:text="  צילום מים מהברז" />
     </RadioGroup>
 
 

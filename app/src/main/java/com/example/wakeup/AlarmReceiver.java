@@ -33,7 +33,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarm.schedule(context);
             } else {
 
-                //stop the StatusBarNotification service if the alarm is not recurring because there are no more alarms.
                 context.stopService(new Intent(context, StatusBarNotificationService.class));
 
                 //make the alarm inactive when it pops. if the alarm isn't recurring.

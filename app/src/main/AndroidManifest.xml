@@ -12,7 +12,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,12 +19,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WakeUp">
-
-
         <service
             android:name=".StatusBarNotificationService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"></service>
         <service
             android:name=".AlarmService"
             android:enabled="true"
@@ -66,11 +63,9 @@
             </intent-filter>
         </receiver>
 
-
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="face" />
-
     </application>
 
 </manifest>

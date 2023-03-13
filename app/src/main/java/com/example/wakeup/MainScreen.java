@@ -6,12 +6,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -152,20 +152,23 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     private void changeFirstMessageToAlarmTime() {
 
-        Intent statusBarService = new Intent(this, StatusBarNotificationService.class);
+        Intent statusBarNotificationService = new Intent(this, StatusBarNotificationService.class);
 
         Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
         if (alarm != null) {
             firstMessageTextView.setText(alarm.getHowMuchTimeTillAlarm());
-            startForegroundService(statusBarService);
+            if (!StatusBarNotificationService.IS_STATUS_BAR_SERVICE_RUNNING)
+                startForegroundService(statusBarNotificationService);
         } else {
-            if (isStatusBarNotificationServiceRunning())
-                stopService(statusBarService);
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
             if (alarmList.isEmpty() == false)
                 firstMessageTextView.setText("כל ההתראות כבויות");
             else
                 firstMessageTextView.setText("התראות");
+
+            if (StatusBarNotificationService.IS_STATUS_BAR_SERVICE_RUNNING)
+                stopService(statusBarNotificationService);
+
         }
     }
 
@@ -197,7 +200,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     //Notification channel, needed for sdk 26 and above
     private void createNotificationChannel() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_MIN);
+        NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_HIGH);
         notificationManager.createNotificationChannel(notificationChannel);
     }
 
@@ -211,15 +214,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
             }
         }
     });
-
-    private boolean isStatusBarNotificationServiceRunning() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (StatusBarNotificationService.class.getName().equals(serviceInfo.service.getClassName()))
-                return true;
-        }
-        return false;
-    }
 
 
 }
