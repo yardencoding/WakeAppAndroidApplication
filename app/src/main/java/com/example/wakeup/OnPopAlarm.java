@@ -53,7 +53,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
             cancelAlarmTextView.setText(name);
 
         if (poppedAlarm.hasMission())
-            cancelAlarmTextView.setText("התחל משימה");
+            stopAlarmServiceButton.setText("התחל משימה");
 
         timeHandler = new Handler();
 
@@ -109,8 +109,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
         } else {
             //Stop alarm service
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
-            getActivity().finish();
-
+            startActivity(new Intent(getContext(), MainScreen.class));
 
         }
     }

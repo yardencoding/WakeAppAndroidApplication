@@ -62,7 +62,8 @@ public class MazeGame extends Fragment implements View.OnClickListener{
         if(mazeView.hasReachedExist()) {
             //stop  alarm service.
             getActivity().stopService(new Intent(getContext(), AlarmService.class));
-            getActivity().finish();
+            //Go back to the Main Screen.
+            startActivity(new Intent(getContext(), MainScreen.class));
 
         }
 

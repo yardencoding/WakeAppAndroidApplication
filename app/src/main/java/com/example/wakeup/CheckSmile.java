@@ -116,8 +116,8 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
                     //Stop alarm service
                     getActivity().stopService(new Intent(getContext(), AlarmService.class));
 
-                    //Close the activity.
-                    getActivity().finish();
+                    //Go back to the Main Screen.
+                    startActivity(new Intent(getContext(), MainScreen.class));
 
                 } else {
                     Toast.makeText(requireContext(), "לא זוהה חיוך בבקשה נסה שוב", Toast.LENGTH_SHORT).show();

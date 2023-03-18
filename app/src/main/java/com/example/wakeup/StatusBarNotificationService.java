@@ -3,12 +3,12 @@ package com.example.wakeup;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
 
 public class StatusBarNotificationService extends Service {
 
@@ -32,6 +32,7 @@ public class StatusBarNotificationService extends Service {
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
 
         IS_STATUS_BAR_SERVICE_RUNNING = true;

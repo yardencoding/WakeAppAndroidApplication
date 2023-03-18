@@ -6,7 +6,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,8 +30,8 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     private RecyclerView alarmsRecyclerView;
     private TextView firstMessageTextView;
-    public static ArrayList<Alarm> alarmList;
-    public static AlarmAdapter adapter;
+    private ArrayList<Alarm> alarms;
+    private AlarmAdapter adapter;
     private Thread updateAlarmTime_thread;
     private Button addAlarmButton;
 
@@ -57,20 +57,20 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         firstMessageTextView = findViewById(R.id.first_message_text_view);
 
         // Contains data from SQLite Database
-        alarmList = new ArrayList<Alarm>();
+        alarms = new ArrayList<Alarm>();
 
         //Download alarms from Database and display on recyclerView
         DataBaseHelper.database = new DataBaseHelper(MainScreen.this);
-        alarmList.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
+        alarms.addAll(DataBaseHelper.database.getAllAlarmsFromDataBase());
 
         //Sorting them so the closest one will always be on top
-        Alarm.sortAlarms(alarmList);
+        Alarm.sortAlarms(alarms);
 
         // build RecyclerView
         alarmsRecyclerView = findViewById(R.id.alarms_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         alarmsRecyclerView.setLayoutManager(layoutManager);
-        adapter = new AlarmAdapter(alarmList, this);
+        adapter = new AlarmAdapter(alarms, this);
         alarmsRecyclerView.setAdapter(adapter);
 
 
@@ -89,7 +89,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     // must be a thread because otherwise the application will be frozen.
 
     public void updateFirstMessage_thread() {
-        final int MILLISECONDS_TO_SLEEP = 100; //So it does not freeze the UI
+        final int MILLISECONDS_TO_SLEEP = 500; //So it does not freeze the UI
         updateAlarmTime_thread = new Thread() {
             public void run() {
                 while (Thread.currentThread().isInterrupted() == false) {
@@ -118,7 +118,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     @Override
     public void onItemLongClick(int position) {
 
-        Alarm deletedAlarm = alarmList.get(position);
+        Alarm deletedAlarm = alarms.get(position);
 
         //Cancel AlarmManger
         deletedAlarm.cancel(MainScreen.this);
@@ -127,7 +127,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         DataBaseHelper.database.deleteAlarm(deletedAlarm);
 
         // Remove alarm from list
-        alarmList.remove(deletedAlarm);
+        alarms.remove(deletedAlarm);
 
 
         // Update adapter
@@ -141,12 +141,8 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     public void onItemClick(int position) {
 
         Intent intent = new Intent(this, CreateAlarm.class);
-        Alarm clickedAlarm = alarmList.get(position);
+        Alarm clickedAlarm = alarms.get(position);
         intent.putExtra("getClickedAlarm", clickedAlarm);
-
-        //To check that I don't change alarm settings to an already existing alarm.
-        intent.putParcelableArrayListExtra("AlarmList", alarmList);
-
         startActivity(intent);
     }
 
@@ -154,20 +150,21 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         Intent statusBarNotificationService = new Intent(this, StatusBarNotificationService.class);
 
-        Alarm alarm = Alarm.getFirstActiveAlarm(alarmList);
+        Alarm alarm = Alarm.getFirstActiveAlarm();
         if (alarm != null) {
             firstMessageTextView.setText(alarm.getHowMuchTimeTillAlarm());
             if (!StatusBarNotificationService.IS_STATUS_BAR_SERVICE_RUNNING)
                 startForegroundService(statusBarNotificationService);
         } else {
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
-            if (alarmList.isEmpty() == false)
+            if (!alarms.isEmpty())
                 firstMessageTextView.setText("כל ההתראות כבויות");
             else
                 firstMessageTextView.setText("התראות");
 
             if (StatusBarNotificationService.IS_STATUS_BAR_SERVICE_RUNNING)
                 stopService(statusBarNotificationService);
+
 
         }
     }
@@ -184,7 +181,6 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         //When add button is clicked
         Intent intent = new Intent(this, CreateAlarm.class);
-        intent.putParcelableArrayListExtra("AlarmList", alarmList);
         startActivity(intent);
     }
 
@@ -200,7 +196,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     //Notification channel, needed for sdk 26 and above
     private void createNotificationChannel() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel notificationChannel = new NotificationChannel(ALARM_RING_CHANNEL_ID, "התראות שעון מעורר", NotificationManager.IMPORTANCE_MIN);
         notificationManager.createNotificationChannel(notificationChannel);
     }
 
@@ -216,6 +212,10 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     });
 
 
+    //There is no need for the back button to work on this Screen. Because in order to create a new alarm it makes more sense to press the add button.
+    @Override
+    public void onBackPressed() {
+    }
 }
 
 

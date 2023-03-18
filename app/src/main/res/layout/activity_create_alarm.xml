@@ -14,7 +14,7 @@
         android:id="@+id/choose_time_button"
         android:layout_width="290dp"
         android:layout_height="70dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="@color/grey"
         android:text="בחר שעה"
         android:textColor="@color/gold"
@@ -30,10 +30,10 @@
         layout="@layout/daypicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choose_time_button" />
+        app:layout_constraintTop_toBottomOf="@+id/show_alarm_days_text_view" />
 
 
     <include
@@ -41,7 +41,7 @@
         layout="@layout/alarm_create_buttons_design"
         android:layout_width="match_parent"
         android:layout_height="390dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="35dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include_daypicker" />
@@ -73,6 +73,18 @@
         android:onClick="onBackIconCreateAlarm"
         app:srcCompat="@drawable/backicon"
         tools:ignore="OnClick" />
+
+    <TextView
+        android:id="@+id/show_alarm_days_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choose_time_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

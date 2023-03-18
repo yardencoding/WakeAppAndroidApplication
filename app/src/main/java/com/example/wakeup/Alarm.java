@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.time.DayOfWeek;
@@ -33,6 +34,7 @@ public class Alarm implements Parcelable {
     private boolean sunday, monday, tuesday, wednesday, thursday, friday, saturday;
     private boolean hasSound, hasVibrate, hasMission, hasUseMyContacts;
 
+    private boolean isRecurring;
 
 
     // initialize an alarm with id, name, mission, hour, minute and which days it will run
@@ -47,7 +49,8 @@ public class Alarm implements Parcelable {
                  boolean hasSound,
                  boolean hasVibrate,
                  boolean hasMission,
-                 boolean hasUseMyContacts
+                 boolean hasUseMyContacts,
+                 boolean isRecurring
     ) {
 
 
@@ -68,6 +71,7 @@ public class Alarm implements Parcelable {
         this.hasVibrate = hasVibrate;
         this.hasMission = hasMission;
         this.hasUseMyContacts = hasUseMyContacts;
+        this.isRecurring = isRecurring;
 
     }
 
@@ -104,8 +108,6 @@ public class Alarm implements Parcelable {
     public boolean isActive() {
         return active;
     }
-
-
 
 
     public boolean isSunday() {
@@ -220,6 +222,14 @@ public class Alarm implements Parcelable {
         this.hasUseMyContacts = hasUseMyContacts;
     }
 
+    public boolean isRecurring() {
+        return isRecurring;
+    }
+
+    public void setRecurring(boolean recurring) {
+        isRecurring = recurring;
+    }
+
 
     // Alarm methods:
 
@@ -231,7 +241,7 @@ public class Alarm implements Parcelable {
         int index = localDateTime.getDayOfWeek().get(WeekFields.SUNDAY_START.dayOfWeek());
 
         //if alarm's time passed increment the day by 1.
-        if(timeHasAlreadyPassed()) {
+        if (timeHasAlreadyPassed()) {
             localDateTime = localDateTime.plusDays(1);
             index = localDateTime.getDayOfWeek().get(WeekFields.SUNDAY_START.dayOfWeek());
         }
@@ -250,15 +260,6 @@ public class Alarm implements Parcelable {
                 isFriday(), isSaturday()};
     }
 
-    //Check if alarms has more than one day
-    public boolean isRecurring() {
-        int count = 0;
-        boolean[] days = getDaysArray();
-        for (int i = 0; i < days.length; i++)
-            if (days[i] == true)
-                count++;
-        return count > 1;
-    }
 
     // Returns true if no day was chosen.
     public boolean hasNoChosenDay() {
@@ -267,7 +268,7 @@ public class Alarm implements Parcelable {
     }
 
     // Returns true if alarm's time had already passed
-    private boolean timeHasAlreadyPassed() {
+    public boolean timeHasAlreadyPassed() {
         LocalDateTime alarmTime = LocalDateTime.now();
         alarmTime = alarmTime.withHour(getHour());
         alarmTime = alarmTime.withMinute(getMinute());
@@ -283,8 +284,6 @@ public class Alarm implements Parcelable {
         }
         setAlarmDay_manually(alarmTime.getDayOfWeek());
     }
-
-
 
 
     // Add the alarm day to the corresponding day attribute.
@@ -335,9 +334,12 @@ public class Alarm implements Parcelable {
 
     //Iterates over the entire alarm list and checks if the alarm that called this method is equal to one of them.
     //By equal I mean has the same time and at least one matching day
-    public boolean alreadyExist(ArrayList<Alarm> alarmArrayList) {
-        for (int i = 0; i < alarmArrayList.size(); i++)
-            return this.equals(alarmArrayList.get(i));
+    public boolean alreadyExist(ArrayList<Alarm> alarms) {
+        for (int i = 0; i < alarms.size(); i++) {
+            if (this.equals(alarms.get(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -345,7 +347,7 @@ public class Alarm implements Parcelable {
         LocalDateTime alarmLocalDateTime = LocalDateTime.now();
         //if the time has already passed change to day to the next week
         //otherwise keep it this week.
-        if(timeHasAlreadyPassed()) {
+        if (timeHasAlreadyPassed()) {
             alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.next(getClosestToCurrentDay()));
         } else {
             alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.nextOrSame(getClosestToCurrentDay()));
@@ -423,13 +425,13 @@ public class Alarm implements Parcelable {
 
 
     // Returns the first active alarm. If all the alarms are inactive in will return null.
-    public static Alarm getFirstActiveAlarm(ArrayList<Alarm> alarmList) {
+    public static Alarm getFirstActiveAlarm() {
+        ArrayList<Alarm> alarms = DataBaseHelper.database.getAllAlarmsFromDataBase();
         Alarm firstActive = null;
-        boolean found = false;
-        for (int i = 0; i < alarmList.size() && !found; i++) {
-            if (alarmList.get(i).isActive()) {
-                firstActive = alarmList.get(i);
-                found = true;
+        for (int i = 0; i < alarms.size(); i++) {
+            if (alarms.get(i).isActive()) {
+                firstActive = alarms.get(i);
+                break;
             }
         }
         return firstActive;
@@ -443,7 +445,7 @@ public class Alarm implements Parcelable {
         long milliseconds = this.getAlarmLocalDateTime().withSecond(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(milliseconds, pendingIntent);
-        alarmManager.setAlarmClock (alarmClockInfo, pendingIntent);
+        alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
 
 
     }
@@ -464,16 +466,18 @@ public class Alarm implements Parcelable {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Alarm alarm = (Alarm) object;
-        if (this.getHour() == alarm.getHour())
-            if (this.getMinute() == alarm.getMinute())
-                return (this.sunday && alarm.isSunday())
-                        || (this.monday && alarm.isMonday())
-                        || (this.tuesday && alarm.isTuesday())
-                        || (this.wednesday && alarm.isWednesday())
-                        || (this.thursday && alarm.isThursday())
-                        || (this.friday && alarm.isFriday())
-                        || (this.saturday && alarm.isSaturday())
-                        ;
+        if (this.getHour() == alarm.getHour()) {
+            if (this.getMinute() == alarm.getMinute()) {
+                if (this.sunday && alarm.isSunday()
+                        || this.monday && alarm.isMonday()
+                        || this.tuesday && alarm.isTuesday()
+                        || this.wednesday && alarm.isWednesday()
+                        || this.thursday && alarm.isThursday()
+                        || this.friday && alarm.isFriday()
+                        || this.saturday && alarm.isSaturday())
+                    return true;
+            }
+        }
 
         return false;
     }
@@ -504,6 +508,8 @@ public class Alarm implements Parcelable {
         hasVibrate = in.readByte() != 0;
         hasMission = in.readByte() != 0;
         hasUseMyContacts = in.readByte() != 0;
+        isRecurring = in.readByte() != 0;
+
 
     }
 
@@ -543,6 +549,7 @@ public class Alarm implements Parcelable {
         parcel.writeByte((byte) (hasVibrate ? 1 : 0));
         parcel.writeByte((byte) (hasMission ? 1 : 0));
         parcel.writeByte((byte) (hasUseMyContacts ? 1 : 0));
+        parcel.writeByte((byte) (isRecurring ? 1 : 0));
 
     }
 
@@ -553,7 +560,7 @@ public class Alarm implements Parcelable {
         String time = String.format("%02d:%02d", getHour(), getMinute());
         String s1 = "התראה לשעה";
 
-        if (!isRecurring()) { // If alarm has one day
+        if (!this.isRecurring) { // If the alarm is not recurring
             int dayInMonth = getAlarmLocalDateTime().getDayOfMonth();
 
 
@@ -562,35 +569,28 @@ public class Alarm implements Parcelable {
             return s1 + " " + time + " " + s2 + " " + dayInMonth + "/" + month;
 
 
-        } else { // If alarm has more than one day
+        } else { // If alarm is recurring
 
             // More efficient because it dose not create a new String in memory each time we change the text
             StringBuilder daysStringBuilder = new StringBuilder();
             if (isSunday())
-                daysStringBuilder.append("א',  ");
+                daysStringBuilder.append("א', ");
             if (isMonday())
-                daysStringBuilder.append("ב',  ");
+                daysStringBuilder.append("ב', ");
             if (isTuesday())
-                daysStringBuilder.append("ג',  ");
+                daysStringBuilder.append("ג', ");
             if (isWednesday())
-                daysStringBuilder.append("ד',  ");
+                daysStringBuilder.append("ד', ");
             if (isThursday())
-                daysStringBuilder.append("ה',  ");
+                daysStringBuilder.append("ה', ");
             if (isFriday())
-                daysStringBuilder.append("ו',  ");
+                daysStringBuilder.append("ו', ");
             if (isSaturday())
                 daysStringBuilder.append("ש'");
 
-            // Remove the third letter from the end which is the comma.
-            // it's the third because of the two spaces.
-            daysStringBuilder.deleteCharAt(daysStringBuilder.length() - 3);
-
-            String s2 = "בימים";
+            String s2 = "מדי יום ";
             return s1 + " " + time + " " + s2 + " " + daysStringBuilder;
 
-            // Returns a string in this format: ההתראה לשעה 6 בתאריך 20/3
-            // Or if it has more than one day it returns ההתראה לשעה 6 בימים א, ג, ה
-            // ^^ those are just examples
         }
     }
 

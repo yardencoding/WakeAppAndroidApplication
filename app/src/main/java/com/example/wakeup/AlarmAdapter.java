@@ -12,7 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
@@ -94,15 +97,19 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         holder.alarmTimeTextView.setText(String.format("%02d:%02d", alarm.getHour(), alarm.getMinute()));
         holder.alarmMissionTextView.setText(alarm.getMission());
 
-        // mark alarm days
-        if (alarm.isSunday()) markSunday(holder);
-        if (alarm.isMonday()) markMonday(holder);
-        if (alarm.isTuesday()) markTuesday(holder);
-        if (alarm.isWednesday()) markWednesday(holder);
-        if (alarm.isThursday()) markThursday(holder);
-        if (alarm.isFriday()) markFriday(holder);
-        if (alarm.isSaturday()) markSaturday(holder);
+        // mark alarm days if the alarm is recurring
+        if (alarm.isRecurring()) {
+            if (alarm.isSunday()) markSunday(holder);
+            if (alarm.isMonday()) markMonday(holder);
+            if (alarm.isTuesday()) markTuesday(holder);
+            if (alarm.isWednesday()) markWednesday(holder);
+            if (alarm.isThursday()) markThursday(holder);
+            if (alarm.isFriday()) markFriday(holder);
+            if (alarm.isSaturday()) markSaturday(holder);
 
+        } else {
+            showAlarmTime_WhenTheAlarm_IsNotRecurring(holder, alarm);
+        }
 
         if (alarm.isActive()) { //turn on Alarm switch, if alarm is Active
             holder.alarmSwitch.setChecked(true);
@@ -168,6 +175,22 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     private void markSaturday(AlarmViewHolder holder) {
         holder.saturdayTextView.setTextSize(checkedDays_TextViewSize);
         holder.saturdayTextView.setTextColor(Color.rgb(daysRgbValues[0], daysRgbValues[1], daysRgbValues[2]));
+    }
+
+    private void showAlarmTime_WhenTheAlarm_IsNotRecurring(AlarmViewHolder holder, Alarm alarm) {
+        LocalDateTime localDateTime;
+            localDateTime = alarm.getAlarmLocalDateTime();
+            holder.sundayTextView.setText(localDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("he-IL"))
+                    + ", " + localDateTime.getDayOfMonth() + "/" + localDateTime.getMonthValue()
+            );
+
+        holder.mondayTextView.setText("");
+        holder.tuesdayTextView.setText("");
+        holder.wednesdayTextView.setText("");
+        holder.thursdayTextView.setText("");
+        holder.fridayTextView.setText("");
+        holder.saturdayTextView.setText("");
+
     }
 
 

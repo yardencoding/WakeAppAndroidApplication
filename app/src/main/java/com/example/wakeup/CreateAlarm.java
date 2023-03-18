@@ -5,14 +5,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -35,7 +31,11 @@ import android.widget.ToggleButton;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CreateAlarm extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
@@ -54,13 +54,15 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private boolean hasSelectedTime = false;
 
 
-    private ArrayList<Alarm> alarmList_FromIntent;
+    private ArrayList<Alarm> alarms;
 
-    //To get the sound name and volume from ChooseSound Activity.
+    //To get the sound name from ChooseSound Activity.
     private SharedPreferences chooseSoundPreferences;
 
-    //Status bar notification id
 
+    private Thread changeShowAlarmDaysThread;
+
+    private TextView showAlarmDaysTextView;
 
 
     @Override
@@ -84,6 +86,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         alarmContactsButton = findViewById(R.id.alarm_contacts_button);
         alarmContactsButton.setOnClickListener(this);
+
+        showAlarmDaysTextView = findViewById(R.id.show_alarm_days_text_view);
 
 
         sundayToggleButton = findViewById(R.id.sunday_toggle_button);
@@ -115,6 +119,10 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         alarmContactsSwitch.setOnCheckedChangeListener(this);
         //If it is checked and I didn't chose a mission yet, open the mission dialog.
         alarmMissionSwitch.setOnCheckedChangeListener(this);
+
+
+        // start the thread that updates show_alarm_days_text_view
+        updateThread();
     }
 
 
@@ -226,31 +234,34 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     alarmSoundSwitch.isChecked(),
                     alarmVibrateSwitch.isChecked(),
                     alarmMissionSwitch.isChecked(),
-                    alarmContactsSwitch.isChecked()
+                    alarmContactsSwitch.isChecked(),
+                    hasSelectedDay()
             );
 
-            if (newAlarm.hasNoChosenDay())
+            if (!newAlarm.isRecurring()) {
                 newAlarm.whenNoDay_WasChosen();
-
-            addAlarmToDataBase_ifNotAlreadyExist(newAlarm);
-
-
-            //set the id of the new alarm based on the AlarmList size.
-            int newAlarmId;
-            if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
-                getClickedAlarm().cancel(this);
-                newAlarmId = alarmList_FromIntent.size();
-            } else {
-                newAlarmId = alarmList_FromIntent.size() + 1;
             }
 
-            // schedule the alarm
-            newAlarm.setId(newAlarmId);
-            newAlarm.schedule(this);
+            if (addAlarmToDataBase_ifNotAlreadyExist(newAlarm)) {
 
 
-            startForegroundService(new Intent(this, StatusBarNotificationService.class));
+                //set the id of the new alarm based on the AlarmList size.
+                int newAlarmId;
+                if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
+                    getClickedAlarm().cancel(this);
+                    newAlarmId = alarms.size();
+                } else {
+                    newAlarmId = alarms.size() + 1;
+                }
 
+                // schedule the alarm
+                newAlarm.setId(newAlarmId);
+                newAlarm.schedule(this);
+
+
+                startForegroundService(new Intent(this, StatusBarNotificationService.class));
+
+            }
 
             // go to the first activity
             Intent goToMainScreen = new Intent(this, MainScreen.class);
@@ -258,7 +269,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
         }
     }
-
 
 
     private boolean hasDisplayOverOtherAppsPermission() {
@@ -329,42 +339,47 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private void alarmWasClicked() {
         Alarm clickedAlarm = getClickedAlarm();
         if (clickedAlarm != null) {
-
             hour = clickedAlarm.getHour();
             minute = clickedAlarm.getMinute();
             chooseTimeButton.setText(String.format("%02d:%02d", hour, minute));
             alarmNameEditText.setText(clickedAlarm.getName());
             alarmMissionNameTextView.setText(clickedAlarm.getMission());
             alarmSoundNameTextView.setText(clickedAlarm.getSoundName());
-            sundayToggleButton.setChecked(clickedAlarm.isSunday());
-            mondayToggleButton.setChecked(clickedAlarm.isMonday());
-            tuesdayToggleButton.setChecked(clickedAlarm.isTuesday());
-            wednesdayToggleButton.setChecked(clickedAlarm.isWednesday());
-            thursdayToggleButton.setChecked(clickedAlarm.isThursday());
-            fridayToggleButton.setChecked(clickedAlarm.isFriday());
-            saturdayToggleButton.setChecked(clickedAlarm.isSaturday());
+
+            //only mark the days if the alarm is recurring.
+            if(clickedAlarm.isRecurring()) {
+                sundayToggleButton.setChecked(clickedAlarm.isSunday());
+                mondayToggleButton.setChecked(clickedAlarm.isMonday());
+                tuesdayToggleButton.setChecked(clickedAlarm.isTuesday());
+                wednesdayToggleButton.setChecked(clickedAlarm.isWednesday());
+                thursdayToggleButton.setChecked(clickedAlarm.isThursday());
+                fridayToggleButton.setChecked(clickedAlarm.isFriday());
+                saturdayToggleButton.setChecked(clickedAlarm.isSaturday());
+            }
+
             alarmSoundSwitch.setChecked(clickedAlarm.hasSound());
             alarmVibrateSwitch.setChecked(clickedAlarm.hasVibrate());
             alarmMissionSwitch.setChecked(clickedAlarm.hasMission());
             alarmContactsSwitch.setChecked(clickedAlarm.hasUseMyContacts());
 
         }
-
     }
 
-    private void addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm) {
-        //To check if the newAlarm dose not already exists.
-        alarmList_FromIntent = getIntent().getParcelableArrayListExtra("AlarmList");
+    private boolean addAlarmToDataBase_ifNotAlreadyExist(Alarm newAlarm) {
 
-        //if we opened this activity through an alarm click, and the alarmList size is one, meaning there is only one alarm.
-        // Skip the alreadyExist check because the alarm is equal to itself
-        if (getClickedAlarm() != null && alarmList_FromIntent.size() == 1) {
-            //Change clicked alarm settings. When we opened this activity through an alarm click.
-            DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
-            return;
+
+        //To check if the newAlarm dose not already exists.
+        alarms = DataBaseHelper.database.getAllAlarmsFromDataBase();
+
+        //When we clicked an alarm and don't change the time or days, only other fields. We have to check this because otherwise the alarm will be equal to itself.
+        if (getClickedAlarm() != null) {
+            if (getClickedAlarm().equals(newAlarm)) {
+                DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
+                return true;
+            }
         }
 
-        if (!newAlarm.alreadyExist(alarmList_FromIntent)) {
+        if (!newAlarm.alreadyExist(alarms)) {
 
 
             if (getClickedAlarm() == null) {
@@ -379,11 +394,15 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             // Toast message with the remaining time until the alarm
             Toast.makeText(CreateAlarm.this, newAlarm.getHowMuchTimeTillAlarm(), Toast.LENGTH_SHORT).show();
 
+            return true; //added successfully
+
         } else {
             //Toast message that says alarm already exist
             Toast.makeText(CreateAlarm.this,
                     "לא ניתן ליצור את ההתראה, משום שהיא מתנגשת עם התראה קיימת ",
                     Toast.LENGTH_SHORT).show();
+
+            return false; //wasn't added
         }
     }
 
@@ -455,6 +474,102 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     }
 
+    //if One of days was chosen then the alarm is recurring.
+    private boolean hasSelectedDay() {
+
+        return sundayToggleButton.isChecked() ||
+                mondayToggleButton.isChecked() ||
+                tuesdayToggleButton.isChecked() ||
+                wednesdayToggleButton.isChecked() ||
+                thursdayToggleButton.isChecked() ||
+                fridayToggleButton.isChecked() ||
+                saturdayToggleButton.isChecked();
+    }
 
 
+    //Is used in order to update the show_alarm_days_text_view with the current days that were chosen. So that the user has a better understanding of the app.
+    private void updateThread() {
+        final int MILLISECONDS_TO_SLEEP = 200; //So it does not freeze the UI
+        changeShowAlarmDaysThread = new Thread() {
+            public void run() {
+                while (Thread.currentThread().isInterrupted() == false) {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            //If a time was selected or it was open through an alarm click
+                            if (hasSelectedTime || getClickedAlarm() != null) {
+
+                                LocalDateTime selectedTime = LocalDateTime.now();
+                                selectedTime = selectedTime.withHour(hour);
+                                selectedTime = selectedTime.withMinute(minute);
+                                LocalDateTime currentTime = LocalDateTime.now();
+
+                                //if the user didn't select a day
+                                if (!hasSelectedDay()) {
+
+                                    // if the time had passed
+                                    if (selectedTime.isBefore(currentTime)) {
+
+                                        selectedTime = selectedTime.plusDays(1);
+                                        showAlarmDaysTextView.setText("מחר- "
+                                                + selectedTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("he-IL"))
+                                                + ", " + selectedTime.getDayOfMonth() + "/" + selectedTime.getMonthValue()
+                                        );
+
+                                        //if the time didn't pass yet
+                                    } else {
+                                        // היום-יום שישי, 17 במרץ
+                                        showAlarmDaysTextView.setText("היום- "
+                                                + selectedTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("he-IL"))
+                                                + ", " + selectedTime.getDayOfMonth() + "/" + selectedTime.getMonthValue()
+                                        );
+
+                                    }
+
+                                } else{
+                                    //if a day was chosen
+
+                                    // More efficient because it dose not create a new String in memory each time we change the text
+                                    StringBuilder daysStringBuilder = new StringBuilder();
+                                    if (sundayToggleButton.isChecked())
+                                        daysStringBuilder.append("א', ");
+                                    if (mondayToggleButton.isChecked())
+                                        daysStringBuilder.append("ב', ");
+                                    if (tuesdayToggleButton.isChecked())
+                                        daysStringBuilder.append("ג', ");
+                                    if (wednesdayToggleButton.isChecked())
+                                        daysStringBuilder.append("ד', ");
+                                    if (thursdayToggleButton.isChecked())
+                                        daysStringBuilder.append("ה', ");
+                                    if (fridayToggleButton.isChecked())
+                                        daysStringBuilder.append("ו', ");
+                                    if (saturdayToggleButton.isChecked())
+                                        daysStringBuilder.append("ש'");
+                                    showAlarmDaysTextView.setText("מדי " + daysStringBuilder);
+
+                                }
+                            }
+
+
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(MILLISECONDS_TO_SLEEP);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        changeShowAlarmDaysThread.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        changeShowAlarmDaysThread.interrupt();
+        super.onDestroy();
+    }
 }

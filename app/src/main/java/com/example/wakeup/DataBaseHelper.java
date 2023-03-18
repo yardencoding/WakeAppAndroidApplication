@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -33,12 +32,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ALARM_SATURDAY = "SATURDAY";
     private static final String COLUMN_ALARM_HAS_SOUND = "HAS_SOUND";
     private static final String COLUMN_ALARM_HAS_VIBRATE = "HAS_VIBRATE";
-    private static final String COLUMN_ALARM_HAS_MISSION= "HAS_MISSION";
-    private static final String COLUMN_ALARM_HAS_CONTACTS= "HAS_CONTACTS";
+    private static final String COLUMN_ALARM_HAS_MISSION = "HAS_MISSION";
+    private static final String COLUMN_ALARM_HAS_CONTACTS = "HAS_CONTACTS";
+
+    private static final String COLUMN_ALARM_IS_RECURRING = "IS_RECURRING";
 
 
     public static DataBaseHelper database;
-
 
 
     public DataBaseHelper(@Nullable Context context) {
@@ -51,28 +51,28 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         String createAlarmTableCommand =
                 "CREATE TABLE "
-                + ALARM_TABLE +
-                " (" +
-                 COLUMN_ALARM_ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ALARM_ACTIVE + " BOOL, "
-                + COLUMN_ALARM_HOUR + " INT, "
-                + COLUMN_ALARM_MINUTE + " INT, "
-                + COLUMN_ALARM_NAME + " TEXT, "
-                + COLUMN_ALARM_MISSION + " TEXT, "
-                + COLUMN_ALARM_SOUND_NAME + " TEXT, "
-                + COLUMN_ALARM_SUNDAY + " BOOL, "
-                + COLUMN_ALARM_MONDAY + " BOOL, "
-                + COLUMN_ALARM_TUESDAY + " BOOL, "
-                + COLUMN_ALARM_WEDNESDAY + " BOOL, "
-                + COLUMN_ALARM_THURSDAY + " BOOL, "
-                + COLUMN_ALARM_FRIDAY + " BOOL, "
-                + COLUMN_ALARM_SATURDAY + " BOOL, "
-                + COLUMN_ALARM_HAS_SOUND + " BOOL, "
-                + COLUMN_ALARM_HAS_VIBRATE +" BOOL, "
-                + COLUMN_ALARM_HAS_MISSION +" BOOL,"
-                + COLUMN_ALARM_HAS_CONTACTS +" BOOL"
-                +");"
-                ;
+                        + ALARM_TABLE +
+                        " (" +
+                        COLUMN_ALARM_ID + " INTEGER PRIMARY KEY, "
+                        + COLUMN_ALARM_ACTIVE + " BOOL, "
+                        + COLUMN_ALARM_HOUR + " INT, "
+                        + COLUMN_ALARM_MINUTE + " INT, "
+                        + COLUMN_ALARM_NAME + " TEXT, "
+                        + COLUMN_ALARM_MISSION + " TEXT, "
+                        + COLUMN_ALARM_SOUND_NAME + " TEXT, "
+                        + COLUMN_ALARM_SUNDAY + " BOOL, "
+                        + COLUMN_ALARM_MONDAY + " BOOL, "
+                        + COLUMN_ALARM_TUESDAY + " BOOL, "
+                        + COLUMN_ALARM_WEDNESDAY + " BOOL, "
+                        + COLUMN_ALARM_THURSDAY + " BOOL, "
+                        + COLUMN_ALARM_FRIDAY + " BOOL, "
+                        + COLUMN_ALARM_SATURDAY + " BOOL, "
+                        + COLUMN_ALARM_HAS_SOUND + " BOOL, "
+                        + COLUMN_ALARM_HAS_VIBRATE + " BOOL, "
+                        + COLUMN_ALARM_HAS_MISSION + " BOOL, "
+                        + COLUMN_ALARM_HAS_CONTACTS + " BOOL, "
+                        + COLUMN_ALARM_IS_RECURRING + " BOOL"
+                        + ");";
 
 
         sqLiteDatabase.execSQL(createAlarmTableCommand);
@@ -86,26 +86,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void addAlarmToDataBase(Alarm newAlarm){
+    public void addAlarmToDataBase(Alarm newAlarm) {
         SQLiteDatabase database = this.getWritableDatabase();
-       database.insert(ALARM_TABLE, null, getAllContentValues(newAlarm));
+        database.insert(ALARM_TABLE, null, getAllContentValues(newAlarm));
     }
 
 
-
-    public  ArrayList<Alarm> getAllAlarmsFromDataBase(){
+    public ArrayList<Alarm> getAllAlarmsFromDataBase() {
         ArrayList<Alarm> returnList = new ArrayList<>();
         String getAlarmsCommand = "SELECT * FROM " + ALARM_TABLE;
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery(getAlarmsCommand, null);
 
         // To move the cursor reference to the first row. In order to access data.
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
 
             do {
 
 
-                boolean isActive =  ( cursor.getInt(1) == 1 ) ? true : false;
+                boolean isActive = (cursor.getInt(1) == 1) ? true : false;
                 int hour = cursor.getInt(2);
                 int minute = cursor.getInt(3);
                 String name = cursor.getString(4);
@@ -122,6 +121,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 boolean hasVibrate = (cursor.getInt(15) == 1) ? true : false;
                 boolean hasMission = (cursor.getInt(16) == 1) ? true : false;
                 boolean hasContacts = (cursor.getInt(17) == 1) ? true : false;
+                boolean isRecurring = (cursor.getInt(18) == 1) ? true : false;
 
 
                 Alarm newAlarm = new Alarm(
@@ -141,7 +141,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                         hasSound,
                         hasVibrate,
                         hasMission,
-                        hasContacts
+                        hasContacts,
+                        isRecurring
                 );
 
                 //Get id
@@ -149,38 +150,38 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
                 returnList.add(newAlarm);
 
-            } while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         database.close();
         return returnList;
     }
 
-    public void changeAlarmActiveState(boolean newState, Alarm alarm){
+    public void changeAlarmActiveState(boolean newState, Alarm alarm) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ALARM_ACTIVE, newState);
-        database.update(ALARM_TABLE,contentValues, COLUMN_ALARM_ID + " = " + String.valueOf(alarm.getId()), null);
+        database.update(ALARM_TABLE, contentValues, COLUMN_ALARM_ID + " = " + alarm.getId(), null);
 
         database.close();
     }
 
-    public void deleteAlarm(Alarm alarm){
+    public void deleteAlarm(Alarm alarm) {
         SQLiteDatabase database = this.getWritableDatabase();
-        database.delete(ALARM_TABLE, COLUMN_ALARM_ID + " = " + String.valueOf(alarm.getId()), null);
+        database.delete(ALARM_TABLE, COLUMN_ALARM_ID + " = " + alarm.getId(), null);
         database.close();
     }
 
-    public void changeAlarmSettings(int id, Alarm newAlarm){
+    public void changeAlarmSettings(int id, Alarm newAlarm) {
 
         SQLiteDatabase database = this.getWritableDatabase();
-        database.update(ALARM_TABLE, getAllContentValues(newAlarm), COLUMN_ALARM_ID + " = " + String.valueOf(id), null);
+        database.update(ALARM_TABLE, getAllContentValues(newAlarm), COLUMN_ALARM_ID + " = " + id, null);
         database.close();
 
     }
 
 
-    private ContentValues getAllContentValues(Alarm newAlarm){
+    private ContentValues getAllContentValues(Alarm newAlarm) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ALARM_ACTIVE, newAlarm.isActive());
         contentValues.put(COLUMN_ALARM_HOUR, newAlarm.getHour());
@@ -199,6 +200,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_ALARM_HAS_VIBRATE, newAlarm.hasVibrate());
         contentValues.put(COLUMN_ALARM_HAS_MISSION, newAlarm.hasMission());
         contentValues.put(COLUMN_ALARM_HAS_CONTACTS, newAlarm.hasUseMyContacts());
+        contentValues.put(COLUMN_ALARM_IS_RECURRING, newAlarm.isRecurring());
+
 
         return contentValues;
     }
