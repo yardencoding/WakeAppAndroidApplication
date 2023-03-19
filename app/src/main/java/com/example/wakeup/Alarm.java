@@ -427,6 +427,10 @@ public class Alarm implements Parcelable {
     // Returns the first active alarm. If all the alarms are inactive in will return null.
     public static Alarm getFirstActiveAlarm() {
         ArrayList<Alarm> alarms = DataBaseHelper.database.getAllAlarmsFromDataBase();
+
+        //Beacause they are not sorted in the data base. And we want the closest one to appear
+        sortAlarms(alarms);
+
         Alarm firstActive = null;
         for (int i = 0; i < alarms.size(); i++) {
             if (alarms.get(i).isActive()) {
