@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -46,7 +47,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             fridayToggleButton, saturdayToggleButton;
     private EditText alarmNameEditText;
     private TextView alarmMissionNameTextView, alarmSoundNameTextView;
-    ;
+
     private ImageButton saveAlarmImageButton;
     private Switch alarmSoundSwitch, alarmVibrateSwitch, alarmMissionSwitch, alarmContactsSwitch;
     private Button alarmSoundButton, alarmMissionButton, alarmContactsButton;
@@ -211,7 +212,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         if (postNotificationWasGranted()
                 && timeWasChosen()
                 && makeSureThatContactsWereAdded()
-                && hasDisplayOverOtherAppsPermission()) {
+                && hasDisplayOverOtherAppsPermission()
+                && makeSureTheCameraPermissionWasGranted()
+        ) {
 
             //Create Alarm fields
             String name = alarmNameEditText.getText().toString();
@@ -347,7 +350,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             alarmSoundNameTextView.setText(clickedAlarm.getSoundName());
 
             //only mark the days if the alarm is recurring.
-            if(clickedAlarm.isRecurring()) {
+            if (clickedAlarm.isRecurring()) {
                 sundayToggleButton.setChecked(clickedAlarm.isSunday());
                 mondayToggleButton.setChecked(clickedAlarm.isMonday());
                 tuesdayToggleButton.setChecked(clickedAlarm.isTuesday());
@@ -459,6 +462,15 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return false;
     }
 
+    private boolean makeSureTheCameraPermissionWasGranted() {
+    // need to implements this.
+        if(alarmMissionSwitch.isChecked()){
+
+        }
+        return true;
+    }
+
+
     private boolean hasSendSmsPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS) ==
@@ -528,7 +540,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
                                     }
 
-                                } else{
+                                } else {
                                     //if a day was chosen
 
                                     // More efficient because it dose not create a new String in memory each time we change the text

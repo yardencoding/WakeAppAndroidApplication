@@ -34,20 +34,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarm.schedule(context);
             } else {
 
+                //delete the alarm if the alarm isn't recurring. Because the alarm is supposed to only trigger once
                 context.stopService(new Intent(context, StatusBarNotificationService.class));
-
-                //make the alarm inactive when it pops. if the alarm isn't recurring.
-                //int firingAlarmIndex = MainScreen.alarms.indexOf(alarm);
-
-                //change the alarm active state to false, from alarmList because the recyclerView loads from alarmList.
-               // MainScreen.alarms.get(firingAlarmIndex).setActive(false);
-
-                //update the alarm active state in sqlite database
-               // DataBaseHelper.database.changeAlarmActiveState(false, alarm);
-
-                //update the alarm adapter so that it call onBindViewHolder()
-                //MainScreen.adapter.notifyItemChanged(firingAlarmIndex);
-                DataBaseHelper.database.changeAlarmActiveState(false, alarm);
+                DataBaseHelper.database.deleteAlarm(alarm);
             }
             context.startActivity(openOnPopAlarm);
         }

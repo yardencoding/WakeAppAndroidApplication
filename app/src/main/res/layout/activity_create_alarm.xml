@@ -26,8 +26,8 @@
 
 
     <include
-        android:id="@+id/include_daypicker"
-        layout="@layout/daypicker"
+        android:id="@+id/include_day_picker"
+        layout="@layout/day_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -44,7 +44,7 @@
         android:layout_marginTop="35dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include_daypicker" />
+        app:layout_constraintTop_toBottomOf="@+id/include_day_picker" />
 
     <ImageButton
         android:id="@+id/save_alarm_image_button"

@@ -233,7 +233,7 @@ public class Alarm implements Parcelable {
 
     // Alarm methods:
 
-    //Returns an Integer that represent alarm's closest day.
+    //Returns an Integer value that represent alarm's closest day.
     public DayOfWeek getClosestToCurrentDay() {
         LocalDateTime localDateTime = LocalDateTime.now();
         boolean[] daysArray = getDaysArray();
@@ -268,7 +268,7 @@ public class Alarm implements Parcelable {
     }
 
     // Returns true if alarm's time had already passed
-    public boolean timeHasAlreadyPassed() {
+    private boolean timeHasAlreadyPassed() {
         LocalDateTime alarmTime = LocalDateTime.now();
         alarmTime = alarmTime.withHour(getHour());
         alarmTime = alarmTime.withMinute(getMinute());
@@ -287,7 +287,7 @@ public class Alarm implements Parcelable {
 
 
     // Add the alarm day to the corresponding day attribute.
-    public void setAlarmDay_manually(DayOfWeek dayOfWeek) {
+    private void setAlarmDay_manually(DayOfWeek dayOfWeek) {
         if (dayOfWeek == DayOfWeek.SUNDAY)
             setSunday(true);
         if (dayOfWeek == DayOfWeek.MONDAY)
@@ -345,7 +345,7 @@ public class Alarm implements Parcelable {
 
     public LocalDateTime getAlarmLocalDateTime() {
         LocalDateTime alarmLocalDateTime = LocalDateTime.now();
-        //if the time has already passed change to day to the next week
+        //if the time had already passed change the day to the next week
         //otherwise keep it this week.
         if (timeHasAlreadyPassed()) {
             alarmLocalDateTime = alarmLocalDateTime.with(TemporalAdjusters.next(getClosestToCurrentDay()));
@@ -382,11 +382,9 @@ public class Alarm implements Parcelable {
         }
 
 
-
-
         /*
          Add the differenceHours to currentTime, So the differenceMinutes will be smaller than 60.
-         Example: if the currentTime is 17:00 And alarm time is 19:30
+         Example: if the currentTime is 17:00 And the alarm time is 19:30
          the difference minutes will be 150 and we don't want that,
          so we add the differenceHours to the currentTime get 19:00,
          and now we can get the differenceMinutes which is 30.

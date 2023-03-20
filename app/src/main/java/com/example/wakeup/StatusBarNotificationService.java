@@ -44,6 +44,19 @@ public class StatusBarNotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Intent activityToStart = new Intent(this, MainScreen.class);
+
+        pendingIntent = PendingIntent.getActivity(this, 0, activityToStart, PendingIntent.FLAG_IMMUTABLE);
+
+
+        notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build();
+
+
         IS_STATUS_BAR_SERVICE_RUNNING = true;
 
         startForeground(NOTIFICATION_ID, notification);
