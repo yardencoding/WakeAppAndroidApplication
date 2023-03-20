@@ -3,6 +3,7 @@ package com.example.wakeup;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -21,10 +22,21 @@ public class HoldFragmentsActivity extends AppCompatActivity {
     }
 
 
-
-
     //To disable the back button from working. Because I do not want to be able to go the previous screen.
     @Override
     public void onBackPressed() {
+    }
+
+    // To hide hardware volume buttons
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP)
+            return true; // Meaning I handled that event
+
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)
+            return true;// Meaning I handled that event
+
+        return super.dispatchKeyEvent(event);
     }
 }

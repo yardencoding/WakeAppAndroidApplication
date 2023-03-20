@@ -200,6 +200,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                     dialog.dismiss();
                 })
                 .setNegativeButton("בטל", (dialog, which) -> {
+
+                    //So the user won't be able to have mission switch checked without choosing a mission.
+                    if(alarmMissionNameTextView.getText().toString().isEmpty())
+                        alarmMissionSwitch.setChecked(false);
+
                     dialog.dismiss();
                 });
 
@@ -213,7 +218,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 && timeWasChosen()
                 && makeSureThatContactsWereAdded()
                 && hasDisplayOverOtherAppsPermission()
-                && makeSureTheCameraPermissionWasGranted()
+                && makeSureTheCameraPermission_WasGranted_IfNeeded()
         ) {
 
             //Create Alarm fields
@@ -462,10 +467,15 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         return false;
     }
 
-    private boolean makeSureTheCameraPermissionWasGranted() {
-    // need to implements this.
-        if(alarmMissionSwitch.isChecked()){
 
+    //To make sure the user is not able to use צילום חיוך or צילום מים מהברז missions without allowing camera permission.
+    private boolean makeSureTheCameraPermission_WasGranted_IfNeeded() {
+        if (alarmMissionSwitch.isChecked()) {
+            if (alarmMissionNameTextView.getText().equals(" צילום חיוך") || alarmMissionNameTextView.getText().equals(" צילום מים מהברז"))
+                if (!hasCameraPermission()) {
+                    requestCameraPermission();
+                    return false;
+                }
         }
         return true;
     }

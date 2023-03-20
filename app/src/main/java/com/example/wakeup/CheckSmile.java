@@ -110,8 +110,7 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
             FirebaseVisionFace face = faces.get(0);
             float smileProbability = face.getSmilingProbability();
             if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY)
-                if (smileProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY
-                        && smileProbability > MINIMUM_PROBABILITY) {
+                if (smileProbability > MINIMUM_PROBABILITY) {
 
                     //Stop alarm service
                     getActivity().stopService(new Intent(getContext(), AlarmService.class));

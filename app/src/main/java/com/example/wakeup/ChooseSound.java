@@ -144,11 +144,11 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
             e.printStackTrace();
         }
 
-        //to set the volume to be 50% if the device max volume.
+        //to set the volume to be 60% if the device max volume.
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int thirtyPercentVolume = (int)(0.5 * maxVolume);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, thirtyPercentVolume, 0);
+        int sixtyPercentVolume = (int)(0.6 * maxVolume);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, sixtyPercentVolume, 0);
 
 
         mediaPlayer.setLooping(true);
