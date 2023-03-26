@@ -252,7 +252,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
             if (addAlarmToDataBase_ifNotAlreadyExist(newAlarm)) {
 
-
                 //set the id of the new alarm based on the AlarmList size.
                 int newAlarmId;
                 if (getClickedAlarm() != null) { //If we want to update this alarm, delete the previous one.
@@ -264,10 +263,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
                 // schedule the alarm
                 newAlarm.setId(newAlarmId);
+
                 newAlarm.schedule(this);
-
-
-                startForegroundService(new Intent(this, StatusBarNotificationService.class));
 
             }
 
@@ -397,6 +394,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
             } else {
                 //Change clicked alarm settings. When we opened this activity through an alarm click.
+                newAlarm.cancel(this); //Cancel the previous alarm.So that we are able to override the settings.
                 DataBaseHelper.database.changeAlarmSettings(getClickedAlarm().getId(), newAlarm);
             }
             // Toast message with the remaining time until the alarm
@@ -414,9 +412,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public void onBackIconCreateAlarm(View view) {
-        super.onBackPressed();
-    }
 
 
     //Needed in order to launch the MANAGE_OVERLAY_PERMISSION screen. and to handle the result.

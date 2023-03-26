@@ -10,7 +10,10 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -355,6 +358,18 @@ public class Alarm implements Parcelable {
 
         alarmLocalDateTime = alarmLocalDateTime.withHour(getHour());
         alarmLocalDateTime = alarmLocalDateTime.withMinute(getMinute());
+
+
+        //To check if the clock will be changed to summer or winter tomorrow, and if so adjust alarm time.
+        if (willBeChanged_ToSummerClockTomorrow(alarmLocalDateTime.toLocalDate())) {
+            alarmLocalDateTime = alarmLocalDateTime.minusHours(1);
+        }
+
+        if (willBeChanged_ToWinterClockTomorrow(alarmLocalDateTime.toLocalDate())) {
+            alarmLocalDateTime = alarmLocalDateTime.plusHours(1);
+
+        }
+
         return alarmLocalDateTime;
     }
 
@@ -448,7 +463,6 @@ public class Alarm implements Parcelable {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, this.id, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(milliseconds, pendingIntent);
         alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
-
 
     }
 
@@ -571,7 +585,7 @@ public class Alarm implements Parcelable {
             return s1 + " " + time + " " + s2 + " " + dayInMonth + "/" + month;
 
 
-        } else { // If alarm is recurring
+        } else { // If the alarm is recurring
 
             // More efficient because it dose not create a new String in memory each time we change the text
             StringBuilder daysStringBuilder = new StringBuilder();
@@ -594,6 +608,36 @@ public class Alarm implements Parcelable {
             return s1 + " " + time + " " + s2 + " " + daysStringBuilder;
 
         }
+    }
+
+
+    //Those methods are used to automatically adjust the alarm to summer and winter clock changes.
+    private boolean willBeChanged_ToSummerClockTomorrow(LocalDate alarmDate) {
+        LocalDate summerClock = LocalDate.of(Year.now().getValue(), Month.MARCH, 1)
+                .with(TemporalAdjusters.lastDayOfMonth())
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                .minusDays(2);
+
+        if(alarmDate.equals(summerClock)){
+            //Because the clock changes at 2am, So we only need to subtract the hour by one if it is before 2am
+            if(LocalDateTime.now().getHour() < 2)
+                return true;
+        }
+
+        return false;
+    }
+
+    private boolean willBeChanged_ToWinterClockTomorrow(LocalDate alarmDate) {
+        LocalDate winterClock = LocalDate.of(Year.now().getValue(), Month.OCTOBER, 1)
+                .with(TemporalAdjusters.lastDayOfMonth())
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        if(alarmDate.equals(winterClock)){
+            //Because the clock changes at 2am, So we only need to increment the hour by one if it is before 2am
+            if(LocalDateTime.now().getHour() < 2)
+                return true;
+        }
+        return false;
     }
 
 

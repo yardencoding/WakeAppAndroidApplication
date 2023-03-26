@@ -22,22 +22,27 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
         } else {
+
+
             //Open onPopAlarm activity
             Alarm alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
+
             Intent openOnPopAlarm = new Intent(context, HoldFragmentsActivity.class);
             openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
+
 
 
             //If the alarm is recurring schedule the next day.
             if (alarm.isRecurring()) {
                 alarm.schedule(context);
             } else {
-
-                //delete the alarm if the alarm isn't recurring. Because the alarm is supposed to only trigger once
-                context.stopService(new Intent(context, StatusBarNotificationService.class));
+                //delete the alarm if the alarm isn't recurring. Because the alarm is supposed to only trigger once.
+                alarm.cancel(context); // To be able to create a new alarm with the same id as this alarm.
                 DataBaseHelper.database.deleteAlarm(alarm);
             }
+
+
             context.startActivity(openOnPopAlarm);
         }
 

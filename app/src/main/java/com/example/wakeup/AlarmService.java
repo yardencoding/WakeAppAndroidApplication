@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import java.io.IOException;
@@ -44,6 +46,7 @@ public class AlarmService extends Service {
 
         alarm = intent.getParcelableExtra("alarmToServiceFromPoppedScreen");
 
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 (int) System.currentTimeMillis(),
                 new Intent(this, MainScreen.class),
@@ -51,6 +54,7 @@ public class AlarmService extends Service {
 
         Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(pendingIntent)
                 .build();

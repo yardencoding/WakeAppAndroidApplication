@@ -196,7 +196,4 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    public void onBackIconChooseSound(View view) {
-        super.onBackPressed();
-    }
 }

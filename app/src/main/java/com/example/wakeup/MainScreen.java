@@ -89,7 +89,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
     // must be a thread because otherwise the application will be frozen.
 
     public void updateFirstMessage_thread() {
-        final int MILLISECONDS_TO_SLEEP = 500; //So it does not freeze the UI
+        final int MILLISECONDS_TO_SLEEP = 300; //So it does not freeze the UI
         updateAlarmTime_thread = new Thread() {
             public void run() {
                 while (Thread.currentThread().isInterrupted() == false) {

@@ -104,24 +104,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             do {
 
 
-                boolean isActive = (cursor.getInt(1) == 1) ? true : false;
+                boolean isActive = cursor.getInt(1) == 1;
                 int hour = cursor.getInt(2);
                 int minute = cursor.getInt(3);
                 String name = cursor.getString(4);
                 String mission = cursor.getString(5);
                 String soundName = cursor.getString(6);
-                boolean sunday = (cursor.getInt(7) == 1) ? true : false;
-                boolean monday = (cursor.getInt(8) == 1) ? true : false;
-                boolean tuesday = (cursor.getInt(9) == 1) ? true : false;
-                boolean wednesday = (cursor.getInt(10) == 1) ? true : false;
-                boolean thursday = (cursor.getInt(11) == 1) ? true : false;
-                boolean friday = (cursor.getInt(12) == 1) ? true : false;
-                boolean saturday = (cursor.getInt(13) == 1) ? true : false;
-                boolean hasSound = (cursor.getInt(14) == 1) ? true : false;
-                boolean hasVibrate = (cursor.getInt(15) == 1) ? true : false;
-                boolean hasMission = (cursor.getInt(16) == 1) ? true : false;
-                boolean hasContacts = (cursor.getInt(17) == 1) ? true : false;
-                boolean isRecurring = (cursor.getInt(18) == 1) ? true : false;
+                boolean sunday = cursor.getInt(7) == 1;
+                boolean monday = cursor.getInt(8) == 1;
+                boolean tuesday = cursor.getInt(9) == 1;
+                boolean wednesday = cursor.getInt(10) == 1;
+                boolean thursday = cursor.getInt(11) == 1;
+                boolean friday = cursor.getInt(12) == 1;
+                boolean saturday = cursor.getInt(13) == 1;
+                boolean hasSound = cursor.getInt(14) == 1;
+                boolean hasVibrate = cursor.getInt(15) == 1;
+                boolean hasMission = cursor.getInt(16) == 1;
+                boolean hasContacts = cursor.getInt(17) == 1;
+                boolean isRecurring = cursor.getInt(18) == 1;
 
 
                 Alarm newAlarm = new Alarm(

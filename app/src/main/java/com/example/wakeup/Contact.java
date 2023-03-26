@@ -193,8 +193,5 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    public void onBackIconContact(View view) {
-        super.onBackPressed();
-    }
 }
 

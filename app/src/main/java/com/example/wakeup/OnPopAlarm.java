@@ -47,6 +47,8 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
 
         poppedAlarm = getActivity().getIntent().getParcelableExtra("alarmToPopScreen");
 
+
+
         String name = poppedAlarm.getName();
 
         if (!name.isEmpty())

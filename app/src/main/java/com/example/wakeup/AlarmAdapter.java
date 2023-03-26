@@ -95,7 +95,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         holder.alarmNameTextView.setText(alarm.getName());
         holder.alarmTimeTextView.setText(String.format("%02d:%02d", alarm.getHour(), alarm.getMinute()));
-        holder.alarmMissionTextView.setText(alarm.getMission());
+        if (alarm.hasMission())
+            holder.alarmMissionTextView.setText(alarm.getMission());
 
         // mark alarm days if the alarm is recurring
         if (alarm.isRecurring()) {
@@ -179,10 +180,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     private void showAlarmTime_WhenTheAlarm_IsNotRecurring(AlarmViewHolder holder, Alarm alarm) {
         LocalDateTime localDateTime;
-            localDateTime = alarm.getAlarmLocalDateTime();
-            holder.sundayTextView.setText(localDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("he-IL"))
-                    + ", " + localDateTime.getDayOfMonth() + "/" + localDateTime.getMonthValue()
-            );
+        localDateTime = alarm.getAlarmLocalDateTime();
+        holder.sundayTextView.setText(localDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("he-IL"))
+                + ", " + localDateTime.getDayOfMonth() + "/" + localDateTime.getMonthValue()
+        );
 
         holder.mondayTextView.setText("");
         holder.tuesdayTextView.setText("");

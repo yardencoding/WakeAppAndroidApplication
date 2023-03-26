@@ -92,21 +92,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phone_number_two_edit_text" />
 
-    <ImageButton
-        android:layoutDirection="ltr"
-        android:id="@+id/imageButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="93dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="3dp"
-        android:background="@color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="parent"
-        android:onClick="onBackIconContact"
-        app:srcCompat="@drawable/backicon"
-        tools:ignore="OnClick" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 
