@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 
@@ -20,9 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if (alarm.isActive())
                     alarm.schedule(context);
 
-
         } else {
-
 
             //Open onPopAlarm activity
             Alarm alarm = intent.getParcelableExtra("alarmToBroadcastReceiver");
@@ -31,16 +31,22 @@ public class AlarmReceiver extends BroadcastReceiver {
             openOnPopAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             openOnPopAlarm.putExtra("alarmToPopScreen", alarm);
 
-
-
             //If the alarm is recurring schedule the next day.
             if (alarm.isRecurring()) {
                 alarm.schedule(context);
             } else {
-                //delete the alarm if the alarm isn't recurring. Because the alarm is supposed to only trigger once.
-                alarm.cancel(context); // To be able to create a new alarm with the same id as this alarm.
-                DataBaseHelper.database.deleteAlarm(alarm);
+
+                //Schedule the alarm to the next day
+                alarm.removeDays();
+                alarm.whenNoDay_WasChosen();
+
+                //Update the alarm so that it will have the updated day
+                DataBaseHelper.database.changeAlarmSettings(alarm.getId(), alarm);
             }
+
+            //Make the alarm inactive
+                DataBaseHelper.database.changeAlarmActiveState(false, alarm);
+
 
 
             context.startActivity(openOnPopAlarm);

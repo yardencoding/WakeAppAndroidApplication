@@ -74,7 +74,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                         + COLUMN_ALARM_IS_RECURRING + " BOOL"
                         + ");";
 
-
         sqLiteDatabase.execSQL(createAlarmTableCommand);
 
     }

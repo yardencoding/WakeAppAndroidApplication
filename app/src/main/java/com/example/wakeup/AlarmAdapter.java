@@ -135,6 +135,15 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                     holder.cardViewLayout.setBackgroundResource(R.color.recyclerViewItemColor);
                     DataBaseHelper.database.changeAlarmActiveState(true, alarm);
                     alarm.setActive(true);
+
+                    //Update the alarm to the next day if the time had passed.
+                    alarm.removeDays();
+                    alarm.whenNoDay_WasChosen();
+                    showAlarmTime_WhenTheAlarm_IsNotRecurring(holder, alarm);
+                    //Update the alarm so that it will have the updated day
+                    DataBaseHelper.database.changeAlarmSettings(alarm.getId(), alarm);
+
+
                     alarm.schedule(holder.itemView.getContext());
                 }
 

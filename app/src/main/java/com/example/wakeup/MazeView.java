@@ -83,7 +83,7 @@ public class MazeView extends View {
         by connection I mean removing the walls(leftWall, rightWall, bottomWall, topWall), setting them to false.
         after that we add the cell to a Stack.
 
-        we keep doing this to every cell (make a connection to one of his neighbours)
+        we keep doing this for every cell (make a connection to one of his neighbours)
         if we have a reached a cell with no valid neighbours we backtrack to the previous cell
         using the stack and choosing a different neighbour.
 

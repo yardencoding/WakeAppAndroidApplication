@@ -66,7 +66,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             SmsManager sms = SmsManager.getDefault();
 
             //Sends to the first number if isn't empty.
-            if (phoneNumberOneEditText.getText().toString().isEmpty() == false) {
+            if (!phoneNumberOneEditText.getText().toString().isEmpty()) {
                 sms.sendTextMessage(
                         phoneNumberOneEditText.getText().toString(),
                         null,
@@ -76,7 +76,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the second number if isn't empty.
-            if (phoneNumberTwoEditText.getText().toString().isEmpty() == false) {
+            if (!phoneNumberTwoEditText.getText().toString().isEmpty()) {
                 sms.sendTextMessage(
                         phoneNumberTwoEditText.getText().toString(),
                         null,
@@ -86,7 +86,7 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
 
             //Sends to the third number if isn't empty
-            if ((phoneNumberThreeEditText.getText().toString().isEmpty() == false)) {
+            if ((!phoneNumberThreeEditText.getText().toString().isEmpty())) {
                 sms.sendTextMessage(
                         phoneNumberThreeEditText.getText().toString(),
                         null,
@@ -154,16 +154,16 @@ public class Contact extends AppCompatActivity implements View.OnClickListener {
             }
         }
 
-        if (phoneNumberTwoEditText.getText().toString().isEmpty() == false) {
+        if (!phoneNumberTwoEditText.getText().toString().isEmpty()) {
 
-            if (phoneNumberTwoEditText.getText().toString().matches(regex) == false) {
+            if (!phoneNumberTwoEditText.getText().toString().matches(regex)) {
                 return false;
             }
         }
 
-        if (phoneNumberThreeEditText.getText().toString().isEmpty() == false) {
+        if (!phoneNumberThreeEditText.getText().toString().isEmpty()) {
 
-            if (phoneNumberThreeEditText.getText().toString().matches(regex) == false) {
+            if (!phoneNumberThreeEditText.getText().toString().matches(regex)) {
                 return false;
             }
         }

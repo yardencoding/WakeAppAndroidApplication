@@ -271,7 +271,7 @@ public class Alarm implements Parcelable {
     }
 
     // Returns true if alarm's time had already passed
-    private boolean timeHasAlreadyPassed() {
+    public boolean timeHasAlreadyPassed() {
         LocalDateTime alarmTime = LocalDateTime.now();
         alarmTime = alarmTime.withHour(getHour());
         alarmTime = alarmTime.withMinute(getMinute());
@@ -638,6 +638,17 @@ public class Alarm implements Parcelable {
                 return true;
         }
         return false;
+    }
+
+    //Sets alarm days to false
+    public void removeDays(){
+        this.setSunday(false);
+        this.setMonday(false);
+        this.setTuesday(false);
+        this.setWednesday(false);
+        this.setThursday(false);
+        this.setFriday(false);
+        this.setSaturday(false);
     }
 
 

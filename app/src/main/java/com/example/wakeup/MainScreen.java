@@ -157,10 +157,13 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                 startForegroundService(statusBarNotificationService);
         } else {
             //Check if the list is not empty because if it is empty there are no alarms to be inactive.
-            if (!alarms.isEmpty())
+            if (!alarms.isEmpty()) {
                 firstMessageTextView.setText("כל ההתראות כבויות");
-            else
+
+            }
+            else {
                 firstMessageTextView.setText("התראות");
+            }
 
             if (StatusBarNotificationService.IS_STATUS_BAR_SERVICE_RUNNING)
                 stopService(statusBarNotificationService);
@@ -168,6 +171,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         }
     }
+
 
     @Override
     protected void onDestroy() {
@@ -189,7 +193,9 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
                 Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_DENIED
         )
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    POST_NOTIFICATION_REQUEST_CODE);
     }
 
 

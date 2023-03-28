@@ -194,7 +194,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                             break;
                         case R.id.mission_dialog_water_from_stream_radio_button:
                             requestCameraPermission();
-                            alarmMissionNameTextView.setText(" צילום מים מהברז");
+                            alarmMissionNameTextView.setText("הלקטת ברז פתוח");
                             break;
                     }
                     dialog.dismiss();
@@ -282,7 +282,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("אפשר הרשאה של הצג מעל אפליקציות אחרות");
             builder.setPositiveButton("לך להגדרות", (dialog, which) -> {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                Intent intent = new Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
                 activityResultLauncher.launch(intent);
             });
             builder.setNegativeButton("סגור", (dialog, which) -> {
@@ -449,8 +451,11 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
 
     private void requestCameraPermission() {
         if (!hasCameraPermission()) {
-            Toast.makeText(this, "יש צורך בגישה למצלמה על מנת להשתמש במשימה שבחרת", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.CAMERA}, MainScreen.CAMERA_REQUEST_CODE);
+            Toast.makeText(this,
+                    "יש צורך בגישה למצלמה על מנת להשתמש במשימה שבחרת", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(CreateAlarm.this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MainScreen.CAMERA_REQUEST_CODE);
         }
     }
 
@@ -487,7 +492,9 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     private void requestSendSmsPermission() {
 
         if (!hasSendSmsPermission())
-            ActivityCompat.requestPermissions(CreateAlarm.this, new String[]{Manifest.permission.SEND_SMS}, MainScreen.SEND_SMS_REQUEST_CODE);
+            ActivityCompat.requestPermissions(CreateAlarm.this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    MainScreen.SEND_SMS_REQUEST_CODE);
 
     }
 
