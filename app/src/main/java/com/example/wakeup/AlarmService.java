@@ -22,23 +22,23 @@ import java.io.IOException;
 public class AlarmService extends Service {
 
     private Alarm alarm;
-    private MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer;
 
-    private Vibrator vibrator;
+    public static Vibrator vibrator;
 
     private  Runnable runnable;
 
     private  Handler handler;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build());
-
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @Override
@@ -47,27 +47,21 @@ public class AlarmService extends Service {
         alarm = intent.getParcelableExtra("alarmToServiceFromPoppedScreen");
 
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                (int) System.currentTimeMillis(),
-                new Intent(this, MainScreen.class),
-                PendingIntent.FLAG_IMMUTABLE);
-
         Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setContentIntent(pendingIntent)
                 .build();
 
         //Play sound
         if(alarm.hasSound()) {
+
             try {
                 mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + ChooseSound.getSoundID(alarm.getSoundName())));
                 mediaPlayer.prepare();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            mediaPlayer.setLooping(true);
 
             //to set the volume to be 60% if the device max volume.
             AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -75,6 +69,7 @@ public class AlarmService extends Service {
             int sixtyPercentVolume = (int)(0.6 * maxVolume);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, sixtyPercentVolume, 0);
 
+            mediaPlayer.setLooping(true);
             mediaPlayer.start();
         }
 
@@ -97,6 +92,7 @@ public class AlarmService extends Service {
            handler.postDelayed(runnable, 60_000);
 
         }
+
 
         startForeground(1, notification);
 

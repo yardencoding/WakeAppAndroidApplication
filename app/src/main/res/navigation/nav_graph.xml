@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_onPopAlarm_to_mazeGame"
             app:destination="@id/mazeGame" />
+        <action
+            android:id="@+id/action_onPopAlarm_to_detectWater"
+            app:destination="@id/detectWater" />
     </fragment>
     <fragment
         android:id="@+id/checkSmile"
@@ -26,4 +29,9 @@
         android:name="com.example.wakeup.MazeGame"
         android:label="fragment_maze_game"
         tools:layout="@layout/fragment_maze_game" />
+    <fragment
+        android:id="@+id/detectWater"
+        android:name="com.example.wakeup.DetectWater"
+        android:label="fragment_detect_water"
+        tools:layout="@layout/fragment_detect_water" />
 </navigation>

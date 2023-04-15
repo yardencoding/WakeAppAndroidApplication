@@ -33,7 +33,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     private String currentSoundName;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +44,17 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         soundNamesRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    clickedRadioButton = findViewById(checkedId);
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
+                clickedRadioButton = findViewById(checkedId);
+                mediaPlayer.reset();
             }
         });
+
+        //Initialize a MediaPlayer obj with audio attributes.
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build());
+        mediaPlayer.setLooping(true);
 
 
         //ImageButtons
@@ -58,13 +63,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
         playAudioButton.setOnClickListener(this);
         saveSoundImageButton.setOnClickListener(this);
-
-        //Initialize a MediaPlayer obj with audio attributes.
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build());
-        mediaPlayer.setLooping(true);
 
 
         loadSoundName();
@@ -79,7 +77,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         as CreateAlarm sound name and set him to checked.
          */
         for (int i = 0; i < soundNamesRadioGroup.getChildCount(); i++) {
-             clickedRadioButton = (RadioButton) soundNamesRadioGroup.getChildAt(i);
+            clickedRadioButton = (RadioButton) soundNamesRadioGroup.getChildAt(i);
             if (clickedRadioButton.getText().toString().equals(currentSoundName)) {
                 clickedRadioButton.setChecked(true);
                 break;
@@ -120,7 +118,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.play_audio_button:
                 playAudio();
                 break;
@@ -134,7 +132,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    private void playAudio(){
+    private void playAudio() {
 
         try {
             //Set mediaPlayer sound
@@ -147,7 +145,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         //to set the volume to be 60% if the device max volume.
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int sixtyPercentVolume = (int)(0.6 * maxVolume);
+        int sixtyPercentVolume = (int) (0.6 * maxVolume);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, sixtyPercentVolume, 0);
 
 
@@ -155,7 +153,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         mediaPlayer.start();
 
     }
-
 
 
     //sharedPreferences setup
@@ -166,7 +163,7 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         editor.apply();
     }
 
-    private void loadSoundName(){
+    private void loadSoundName() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         currentSoundName = sharedPreferences.getString(SOUND_NAME, "Homecoming");
     }
@@ -186,7 +183,6 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
         }
         return super.dispatchKeyEvent(event);
     }
-
 
 
     @Override

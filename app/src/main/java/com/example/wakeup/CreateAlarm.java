@@ -193,8 +193,8 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                             alarmMissionNameTextView.setText(" פתירת מבוך");
                             break;
                         case R.id.mission_dialog_water_from_stream_radio_button:
-                            requestCameraPermission();
-                            alarmMissionNameTextView.setText("הלקטת ברז פתוח");
+                            requestAudioPermission();
+                            alarmMissionNameTextView.setText(" הקלטת ברז פתוח");
                             break;
                     }
                     dialog.dismiss();
@@ -202,7 +202,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 .setNegativeButton("בטל", (dialog, which) -> {
 
                     //So the user won't be able to have mission switch checked without choosing a mission.
-                    if(alarmMissionNameTextView.getText().toString().isEmpty())
+                    if (alarmMissionNameTextView.getText().toString().isEmpty())
                         alarmMissionSwitch.setChecked(false);
 
                     dialog.dismiss();
@@ -219,6 +219,7 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
                 && makeSureThatContactsWereAdded()
                 && hasDisplayOverOtherAppsPermission()
                 && makeSureTheCameraPermission_WasGranted_IfNeeded()
+                && makeSureTheAudioPermission_WasGranted_IfNeeded()
         ) {
 
             //Create Alarm fields
@@ -415,7 +416,6 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     }
 
 
-
     //Needed in order to launch the MANAGE_OVERLAY_PERMISSION screen. and to handle the result.
     private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (!Settings.canDrawOverlays(CreateAlarm.this)) {
@@ -468,16 +468,49 @@ public class CreateAlarm extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    //To make sure the user is not able to use צילום חיוך or צילום מים מהברז missions without allowing camera permission.
+    //To make sure the user is not able to use צילום חיוך  mission without allowing camera permission.
     private boolean makeSureTheCameraPermission_WasGranted_IfNeeded() {
         if (alarmMissionSwitch.isChecked()) {
-            if (alarmMissionNameTextView.getText().equals(" צילום חיוך") || alarmMissionNameTextView.getText().equals(" צילום מים מהברז"))
+            if (alarmMissionNameTextView.getText().equals(" צילום חיוך"))
                 if (!hasCameraPermission()) {
                     requestCameraPermission();
                     return false;
                 }
         }
         return true;
+    }
+
+    //To make sure the user is not able to use הקלטת ברז פתוח  mission without allowing record audio permission.
+
+    private boolean makeSureTheAudioPermission_WasGranted_IfNeeded() {
+        if (alarmMissionSwitch.isChecked()) {
+            if (alarmMissionNameTextView.getText().equals(" הקלטת ברז פתוח")) {
+                if (!hasRecordAudioPermission()) {
+                    requestAudioPermission();
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    private void requestAudioPermission() {
+        if(!hasRecordAudioPermission()){
+            Toast.makeText(this, "יש צורך בגישה זו על מנת להשתמש במשימה שבחרת",Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.RECORD_AUDIO},
+                    MainScreen.RECORD_AUDIO_REQUEST_CODE);
+        }
+
+    }
+
+    private boolean hasRecordAudioPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED)
+            return true;
+        return false;
+
     }
 
 

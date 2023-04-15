@@ -66,7 +66,6 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
 
     }
 
-
     private Runnable updateTimeTask = new Runnable() {
         @Override
         public void run() {
@@ -105,9 +104,8 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
                 Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_checkSmile);
             } else if (poppedAlarm.getMission().equals(" פתירת מבוך")) {
                 Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_mazeGame);
-            } else;
-            // הקלטה של ברז פתוח
-
+            } else
+                Navigation.findNavController(view).navigate(R.id.action_onPopAlarm_to_detectWater);
 
 
         } else {

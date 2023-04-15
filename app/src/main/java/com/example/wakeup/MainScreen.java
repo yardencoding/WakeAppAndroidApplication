@@ -42,6 +42,9 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
     public static final int CAMERA_REQUEST_CODE = 4;
 
+    public static final int RECORD_AUDIO_REQUEST_CODE = 5;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
