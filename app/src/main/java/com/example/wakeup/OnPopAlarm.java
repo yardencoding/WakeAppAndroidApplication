@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -64,6 +66,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
         startAlarmService.putExtra("alarmToServiceFromPoppedScreen", poppedAlarm);
         getActivity().startForegroundService(startAlarmService);
 
+
     }
 
     private Runnable updateTimeTask = new Runnable() {
@@ -72,6 +75,7 @@ public class OnPopAlarm extends Fragment implements View.OnClickListener {
             showCurrentTimeTextView.setText(getCurrentTime());
             // schedule the task to run again after 1 minute
             timeHandler.postDelayed(this, 60_000);
+
         }
     };
 

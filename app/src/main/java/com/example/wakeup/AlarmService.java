@@ -81,16 +81,7 @@ public class AlarmService extends Service {
 
         //Send sms
         if(alarm.hasUseMyContacts()){
-            //Wait one minute and if the user does not wake up Send sms to his contacts
-             handler = new Handler();
-           runnable =  new Runnable(){
-                @Override
-                public void run() {
-                    Contact.sendSms(AlarmService.this);
-                }
-            };
-           handler.postDelayed(runnable, 60_000);
-
+            Contact.sendSms(this);
         }
 
 

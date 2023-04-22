@@ -136,6 +136,8 @@ public class ChooseSound extends AppCompatActivity implements View.OnClickListen
 
         try {
             //Set mediaPlayer sound
+            if (mediaPlayer.isPlaying())
+                mediaPlayer.reset();
             mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + getSoundID(clickedRadioButton.getText().toString())));
             mediaPlayer.prepare();
         } catch (IOException e) {
