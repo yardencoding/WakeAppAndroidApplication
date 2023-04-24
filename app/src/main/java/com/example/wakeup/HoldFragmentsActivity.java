@@ -1,7 +1,9 @@
 package com.example.wakeup;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.Navigation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -27,14 +29,6 @@ public class HoldFragmentsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
     }
-
-    //To notify the user what will happened if he closes the app.
-    @Override
-    protected void onPause() {
-        Toast.makeText(this, "אל תסגור את האפליקציה! לא תוכל לכבות את ההתראה לאחר מכן", Toast.LENGTH_SHORT).show();
-        super.onPause();
-    }
-
 
 
 

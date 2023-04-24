@@ -51,6 +51,14 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
+        //To check if the user closed the app and then reopen while the alarm is playing. That is to make sure he is able to close the alarm again.
+        if(AlarmService.isRunning){
+            Intent reOpenActivity = new Intent(this, HoldFragmentsActivity.class);
+            reOpenActivity.putExtra("alarmToPopScreen", AlarmService.alarmToReOpen);
+            startActivity(reOpenActivity);
+
+        }
+
         //Add alarm button
         addAlarmButton = findViewById(R.id.add_alarm_button);
         addAlarmButton.setOnClickListener(this);
@@ -83,6 +91,7 @@ public class MainScreen extends AppCompatActivity implements RecyclerViewInterfa
 
         //Request showing notification permission.
         requestNotificationPermission();
+
 
 
     }

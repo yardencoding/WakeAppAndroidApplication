@@ -26,10 +26,10 @@ public class AlarmService extends Service {
 
     public static Vibrator vibrator;
 
-    private  Runnable runnable;
+    public static boolean isRunning;
 
-    private  Handler handler;
-
+    //Used to save alarm settings when we reopen the activity.
+    public static Alarm alarmToReOpen;
 
     @Override
     public void onCreate() {
@@ -39,6 +39,8 @@ public class AlarmService extends Service {
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build());
+
+        isRunning = true;
     }
 
     @Override
@@ -46,6 +48,7 @@ public class AlarmService extends Service {
 
         alarm = intent.getParcelableExtra("alarmToServiceFromPoppedScreen");
 
+        alarmToReOpen = alarm;
 
         Notification notification = new NotificationCompat.Builder(this, MainScreen.ALARM_RING_CHANNEL_ID)
                 .setContentTitle("התראה..")
@@ -57,6 +60,7 @@ public class AlarmService extends Service {
         if(alarm.hasSound()) {
 
             try {
+                mediaPlayer.reset();
                 mediaPlayer.setDataSource(this, Uri.parse("android.resource://com.example.wakeup/" + ChooseSound.getSoundID(alarm.getSoundName())));
                 mediaPlayer.prepare();
             } catch (IOException e) {
@@ -84,6 +88,7 @@ public class AlarmService extends Service {
             Contact.sendSms(this);
         }
 
+        isRunning = true;
 
         startForeground(1, notification);
 
@@ -100,9 +105,8 @@ public class AlarmService extends Service {
         if(alarm.hasVibrate()) {
             vibrator.cancel();
         }
-        if(alarm.hasUseMyContacts()){
-            handler.removeCallbacks(runnable);
-        }
+
+        isRunning = false;
         super.onDestroy();
     }
 
