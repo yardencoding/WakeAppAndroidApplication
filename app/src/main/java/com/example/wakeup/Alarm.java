@@ -78,10 +78,6 @@ public class Alarm implements Parcelable {
 
     }
 
-    // Sometimes an empty constructor is needed.
-    public Alarm() {
-    }
-
 
     public void setId(int id) {
         this.id = id;

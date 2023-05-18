@@ -34,7 +34,6 @@ public class AlarmService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_ALARM)
@@ -79,6 +78,7 @@ public class AlarmService extends Service {
 
         //Vibrate
         if(alarm.hasVibrate()){
+            vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             long[] pattern = {0, 500, 1000};
             vibrator.vibrate(VibrationEffect.createWaveform(pattern, 1));
         }

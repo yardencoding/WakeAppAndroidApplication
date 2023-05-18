@@ -43,7 +43,7 @@ public class DetectWater extends Fragment implements View.OnClickListener {
 
     private AudioRecord record;
 
-
+    private boolean detectedWater;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,13 +70,13 @@ public class DetectWater extends Fragment implements View.OnClickListener {
 
     private void stopRecording() {
 
-        //Resume sound
-        if(AlarmService.mediaPlayer != null) {
+        //Resume sound if it didn't detect water
+        if(AlarmService.mediaPlayer != null && !detectedWater) {
             AlarmService.mediaPlayer.start();
         }
 
-        //Resume vibration
-        if(AlarmService.vibrator != null){
+        //Resume vibration if it didn't detect water
+        if(AlarmService.vibrator != null && !detectedWater){
             long[] pattern = {0, 500, 1000};
             AlarmService.vibrator.vibrate(VibrationEffect.createWaveform(pattern, 1));
         }
@@ -116,7 +116,6 @@ public class DetectWater extends Fragment implements View.OnClickListener {
 
         tensorAudio.load(record);
         List<Classifications> output = audioClassifier.classify(tensorAudio);
-        boolean detectedWater = false;
 
         for (Classifications classifications : output) {
             for (Category category : classifications.getCategories()) {

@@ -89,8 +89,8 @@ public class CheckSmile extends Fragment implements View.OnClickListener, OnSucc
 
         //Initialize the FaceDetectorOptions.
         FirebaseVisionFaceDetectorOptions faceDetectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
-                        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE) //Accurate over speed
+                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS) // to be able to classify images into categories such as smiling
                         .build();
 
         //Initialize the face FaceDetector. so that we will be able to use the "detectInImage" function & onSuccess Interface to process the faces.
